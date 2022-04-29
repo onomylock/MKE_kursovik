@@ -48,7 +48,7 @@ namespace MKE_kursovik
             //{
             //    A.di[s1.NumVertex] = 1.0e50;
             //}
-            
+
             for (int i = 1; i < io.Time.Count; i++)
             {
                 rightB = new GlobalVectorB();
@@ -56,27 +56,35 @@ namespace MKE_kursovik
                 rightB.GenGlobalB(M, io.RZ, io.Elements, ia, ja, Q[i - 1], io.Time[i], io.Time[i] - io.Time[i - 1], io.Params);
                 Q_tmp = new double[N];
 
-                for(int j = 0; j < N; j++)
-				{
+                for (int j = 0; j < N; j++)
+                {
                     Q_tmp[j] += M.di[j] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
-                    for(int k = ia[j]; k < ia[j + 1]; k++)
-					{
+                    for (int k = ia[j]; k < ia[j + 1]; k++)
+                    {
                         int l = ja[k];
                         Q_tmp[j] += M.ggl[k] * Q[i - 1][l] / (io.Time[i] - io.Time[i - 1]);
                         Q_tmp[l] += M.ggu[k] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
                     }
-				}
-				for (int j = 0; j < N; j++)
-				{
-					rightB.B[j] += Q_tmp[j] ;
-				}
+                }
+                for (int j = 0; j < N; j++)
+                {
+                    rightB.B[j] += Q_tmp[j];
+                }
 
-				foreach (var s1 in io.Bound1)
-				{
-					A.di[s1.NumVertex] = 1.0e50;
-					rightB.B[s1.NumVertex] = 1.0e50 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
-				}
-				Q.Add(LOS());
+                foreach (var s2 in io.Bound2)
+                {
+                    double HZtmp = io.RZ[s2.NumVertex2].Z - io.RZ[s2.NumVertex1].Z;
+                    double[] S2Tmp = s2.GenVectorBS2(io.RZ[s2.NumVertex1], io.RZ[s2.NumVertex2], io.Time[i], HZtmp);
+                    rightB.B[s2.NumVertex1] += S2Tmp[0];
+                    rightB.B[s2.NumVertex2] += S2Tmp[1];
+                }
+
+                foreach (var s1 in io.Bound1)
+                {
+                    A.di[s1.NumVertex] = 1.0e50;
+                    rightB.B[s1.NumVertex] = 1.0e50 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
+                }
+                Q.Add(LOS());
             }
 
             using (StreamWriter writer = new StreamWriter("output.txt", false))
@@ -89,14 +97,14 @@ namespace MKE_kursovik
                     writer.WriteLine("Time = " + io.Time[i].ToString());
                     double[] Az_true = new double[Q[i].Length];
                     double sum = 0;
-                    for(int k = 0; k < io.Elements.Count; k++)
-					{
-                        for(int j = 0; j < 4; j++)
-						{
+                    for (int k = 0; k < io.Elements.Count; k++)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
                             int l = io.Elements[k].VertexArr.ToArray()[j];
                             Az_true[l] = function.AzTrue(io.RZ[l].R, io.RZ[l].Z, io.Time[i]);
                         }
-					}
+                    }
                     for (int j = 0; j < Q[i].Length; j++)
                     {
                         double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
@@ -109,7 +117,7 @@ namespace MKE_kursovik
                 }
                 writer.Close();
             }
-		}
+        }
 
         private void LUsq(double[] ggl, double[] ggu, double[] di)
         {

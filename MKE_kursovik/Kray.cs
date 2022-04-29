@@ -38,6 +38,27 @@ namespace MKE_kursovik
 
     public class S2
     {
+        public S2(int NumVertex1, int NumVertex2, int Side)
+        {
+            this.NumVertex1 = NumVertex1;
+            this.NumVertex2 = NumVertex2;
+            this.Side = Side;
+        }
 
+        public int Side { get; }
+        public int NumVertex1 { get; }
+        public int NumVertex2 { get; }
+
+        private double TettaFun(Vertex P)
+        {
+            return 0;
+        }
+
+        public double[] GenVectorBS2(Vertex P1, Vertex P2, double t, double Hz)
+        {
+            double[] B_S2 = new double[2];
+
+            return B_S2;
+        }
     }
 }

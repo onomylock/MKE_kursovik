@@ -11,7 +11,7 @@ namespace MKE_kursovik
         public IEnumerable<int> VertexArr { get; }
         public int NMat { get; }
         //double Sigma { get; set; }
-        //double Lambda { get; set; }
+        //double Mu { get; set; }
     }
 
     public class Element : IElement
@@ -37,9 +37,9 @@ namespace MKE_kursovik
         }
 
         public Vertex()
-		{
+        {
 
-		}
+        }
 
     }
 
@@ -54,20 +54,27 @@ namespace MKE_kursovik
     public class Parameter
     {
         public double Sigma { get; }
-        public double Lambda { get; }
+        public double Mu { get; }
 
-        public Parameter(double sigma, double lambda)
+        public Parameter(double sigma, double mu)
         {
             Sigma = sigma;
-            Lambda = lambda;
+            Mu = mu;
         }
     }
 
     public class Function
     {
-        public double fun(double r, double z, double t, Parameter param)
+        public double fun(double r, double z, double t, Parameter param, int NumFuction)
         {
-            return - 4 * param.Lambda;
+            switch (NumFuction)
+            {
+                case 1: return 1;
+                case 2: return 0;
+                default:
+                    break;
+            }
+            return -4 * param.Mu;
             //return -16 * r * r;
             //return -2 * Math.Sin(r * r + 3 * z) - 4 * r * r * Math.Cos(r * r + 3 * z) - Math.Cos(t);
         }
@@ -120,13 +127,13 @@ namespace MKE_kursovik
                 LocalF[3] = function.fun(RZ[elemArr[0]].R + hr, RZ[elemArr[0]].Z + hz, tNow, Params[elem.NMat]);
 
                 double[] LocalB = GenLocal(LocalF, RZ[elemArr[0]].R, hr, hz);
-				//for (int i = 0; i < elemArr.Length; i++)
-				//{
-				//	LocalQ[i] = QLast[elemArr[i]];
-				//}
-				//LocalQ = GenLocal(LocalQ, RZ[elemArr[0]].R, hr, hz);
+                //for (int i = 0; i < elemArr.Length; i++)
+                //{
+                //	LocalQ[i] = QLast[elemArr[i]];
+                //}
+                //LocalQ = GenLocal(LocalQ, RZ[elemArr[0]].R, hr, hz);
 
-				for (int i = 0; i < elemArr.Length; i++)
+                for (int i = 0; i < elemArr.Length; i++)
                 {
                     //B[elemArr[i]] += LocalB[i] + Params[elem.NMat].Sigma * LocalQ[i] / th;
                     B[elemArr[i]] += LocalB[i];
@@ -134,26 +141,26 @@ namespace MKE_kursovik
                 }
             }
 
-   //         for(int i = 0; i < B.Length; i++)
-			//{
-   //             B[i] += Q_tmp[i] / th;
-			//}
-   //         double[] B2 = new double[B.Length];
-   //         for(int i = 0; i < B.Length; i++)
-			//{
-   //             B2[i] = M.di[i] * QLast[i];
-   //             for(int j = ia[i]; j < ia[i + 1]; j++)
-			//	{
-   //                 int k = ja[j];
-   //                 B2[i] += M.ggl[j] * QLast[k];
-   //                 B2[k] += M.ggu[j] * QLast[i];
-   //             }
-			//}
+            //         for(int i = 0; i < B.Length; i++)
+            //{
+            //             B[i] += Q_tmp[i] / th;
+            //}
+            //         double[] B2 = new double[B.Length];
+            //         for(int i = 0; i < B.Length; i++)
+            //{
+            //             B2[i] = M.di[i] * QLast[i];
+            //             for(int j = ia[i]; j < ia[i + 1]; j++)
+            //	{
+            //                 int k = ja[j];
+            //                 B2[i] += M.ggl[j] * QLast[k];
+            //                 B2[k] += M.ggu[j] * QLast[i];
+            //             }
+            //}
 
-   //         for (int i = 0; i < B.Length; i++)
-			//{
-   //             B[i] += B2[i] / th;
-			//}
+            //         for (int i = 0; i < B.Length; i++)
+            //{
+            //             B[i] += B2[i] / th;
+            //}
 
         }
 
@@ -165,27 +172,27 @@ namespace MKE_kursovik
                     //b2 = Hr,
                     b3 = Math.Pow(Hr, 2);
 
-			LocalQ[0] = LocalVec[0] * b1 * (4 * b2 + b3) +
-						LocalVec[1] * b1 * (2 * b2 + b3) +
-						LocalVec[2] * b1 * (4 * b2 + b3) / 2 +
-						LocalVec[3] * b1 * (2 * b2 + b3) / 2;
+            LocalQ[0] = LocalVec[0] * b1 * (4 * b2 + b3) +
+                        LocalVec[1] * b1 * (2 * b2 + b3) +
+                        LocalVec[2] * b1 * (4 * b2 + b3) / 2 +
+                        LocalVec[3] * b1 * (2 * b2 + b3) / 2;
 
-			LocalQ[1] = LocalVec[0] * b1 * (2 * b2 + b3) +
-						LocalVec[1] * b1 * (4 * b2 + 3 * b3) +
-						LocalVec[2] * b1 * (2 * b2 + b3) / 2 +
-						LocalVec[3] * b1 * (4 * b2 + 3 * b3) / 2;
+            LocalQ[1] = LocalVec[0] * b1 * (2 * b2 + b3) +
+                        LocalVec[1] * b1 * (4 * b2 + 3 * b3) +
+                        LocalVec[2] * b1 * (2 * b2 + b3) / 2 +
+                        LocalVec[3] * b1 * (4 * b2 + 3 * b3) / 2;
 
-			LocalQ[2] = LocalVec[0] * b1 * (4 * b2 + b3) / 2 +
-						LocalVec[1] * b1 * (2 * b2 + b3) / 2 +
-						LocalVec[2] * b1 * (4 * b2 + b3) +
-						LocalVec[3] * b1 * (2 * b2 + b3);
+            LocalQ[2] = LocalVec[0] * b1 * (4 * b2 + b3) / 2 +
+                        LocalVec[1] * b1 * (2 * b2 + b3) / 2 +
+                        LocalVec[2] * b1 * (4 * b2 + b3) +
+                        LocalVec[3] * b1 * (2 * b2 + b3);
 
-			LocalQ[3] = LocalVec[0] * b1 * (2 * b2 + b3) / 2 +
-						LocalVec[1] * b1 * (4 * b2 + 3 * b3) / 2 +
-						LocalVec[2] * b1 * (2 * b2 + b3) +
-						LocalVec[3] * b1 * (4 * b2 + 3 * b3);
+            LocalQ[3] = LocalVec[0] * b1 * (2 * b2 + b3) / 2 +
+                        LocalVec[1] * b1 * (4 * b2 + 3 * b3) / 2 +
+                        LocalVec[2] * b1 * (2 * b2 + b3) +
+                        LocalVec[3] * b1 * (4 * b2 + 3 * b3);
 
-			return LocalQ;
+            return LocalQ;
         }
     }
 
@@ -238,16 +245,16 @@ namespace MKE_kursovik
 
         public double[,] GenLocal(double rp, Parameter param, double Hz, double Hr)
         {
-			double[,] LocalG = new double[4, 4];
-			double a1 = (param.Lambda * Hz * rp) / (6 * Hr),
-					a2 = (param.Lambda * Hz) / (12),
-					a3 = (param.Lambda * Hr * rp) / (6 * Hz),
-					a4 = (param.Lambda * Hr * Hr) / (12 * Hz);
-			//double a1 = (param.Lambda * Hz) / (6 * Hr),
-			//        a2 = (param.Lambda * Hz) / (12),
-			//        a3 = (param.Lambda * Hr) / (6 * Hz),
-			//        a4 = (param.Lambda * Hr) / (12 * Hz);
-			LocalG[0, 0] = 2 * a1 + 2 * a2 + 2 * a3 + 1 * a4;
+            double[,] LocalG = new double[4, 4];
+            double a1 = (param.Mu * Hz * rp) / (6 * Hr),
+                    a2 = (param.Mu * Hz) / (12),
+                    a3 = (param.Mu * Hr * rp) / (6 * Hz),
+                    a4 = (param.Mu * Hr * Hr) / (12 * Hz);
+            //double a1 = (param.Mu * Hz) / (6 * Hr),
+            //        a2 = (param.Mu * Hz) / (12),
+            //        a3 = (param.Mu * Hr) / (6 * Hz),
+            //        a4 = (param.Mu * Hr) / (12 * Hz);
+            LocalG[0, 0] = 2 * a1 + 2 * a2 + 2 * a3 + 1 * a4;
             LocalG[0, 1] = -2 * a1 - 2 * a2 + 1 * a3 + 1 * a4;
             LocalG[0, 2] = 1 * a1 + 1 * a2 - 2 * a3 - 1 * a4;
             LocalG[0, 3] = -1 * a1 - 1 * a2 - 1 * a3 - 1 * a4;
@@ -343,7 +350,7 @@ namespace MKE_kursovik
         }
     }
 
-   
+
 
     public class Mesh
     {
