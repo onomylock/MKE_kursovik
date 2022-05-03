@@ -66,8 +66,10 @@ namespace MKE_kursovik
         static void Main(string[] args)
         {
             Program program = new Program();
+            
             program.io = new IO(true);
             program.solve = new(program.io);
+            Console.WriteLine("y");
             // List<Vertex> Points = new List<Vertex>();
             // int layer;
 

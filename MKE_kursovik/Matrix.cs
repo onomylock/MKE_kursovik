@@ -29,18 +29,21 @@ namespace MKE_kursovik
     {
         public double R { get; set; }
         public double Z { get; set; }
+        public int NumOfFun { get; set; }
+
+        public Vertex(double r, double z, int num)
+        {
+            R = r;
+            Z = z;
+            NumOfFun = num;
+        }
 
         public Vertex(double r, double z)
         {
             R = r;
             Z = z;
+            NumOfFun = 0;
         }
-
-        public Vertex()
-        {
-
-        }
-
     }
 
     public interface IGlobalMatrix
@@ -65,23 +68,28 @@ namespace MKE_kursovik
 
     public class Function
     {
-        public double fun(double r, double z, double t, Parameter param, int NumFuction)
+        public double fun(Vertex rz, double t, Parameter param)
         {
-            switch (NumFuction)
+            switch (rz.NumOfFun)
             {
                 case 1: return 1;
                 case 2: return 0;
-                default:
-                    break;
+                default: return 0;
             }
-            return -4 * param.Mu;
+            //return -4 * param.Mu;
             //return -16 * r * r;
             //return -2 * Math.Sin(r * r + 3 * z) - 4 * r * r * Math.Cos(r * r + 3 * z) - Math.Cos(t);
         }
 
-        public double AzTrue(double r, double z, double t)
+        public double AzTrue(Vertex rz, double t)
         {
-            return r;
+			switch (rz.NumOfFun)
+			{
+                case 1: return 1;
+                case 2: return 0;
+				default: return 0;
+			}
+			//return r;
             //return r * r * r * r;
             //return r * r * r * r;
             //return Math.Cos(r * r + 3 * z) - Math.Sin(t);
@@ -121,10 +129,11 @@ namespace MKE_kursovik
                 double hr = RZ[elemArr[1]].R - RZ[elemArr[0]].R;
                 double[] LocalF = new double[4];
                 double[] LocalQ = new double[4];
-                LocalF[0] = function.fun(RZ[elemArr[0]].R, RZ[elemArr[0]].Z, tNow, Params[elem.NMat]);
-                LocalF[1] = function.fun(RZ[elemArr[0]].R + hr, RZ[0].Z, tNow, Params[elem.NMat]);
-                LocalF[2] = function.fun(RZ[elemArr[0]].R, RZ[elemArr[0]].Z + hz, tNow, Params[elem.NMat]);
-                LocalF[3] = function.fun(RZ[elemArr[0]].R + hr, RZ[elemArr[0]].Z + hz, tNow, Params[elem.NMat]);
+
+                LocalF[0] = function.fun(RZ[elemArr[0]], tNow, Params[elem.NMat]);
+                LocalF[1] = function.fun(RZ[elemArr[1]], tNow, Params[elem.NMat]);
+                LocalF[2] = function.fun(RZ[elemArr[2]], tNow, Params[elem.NMat]);
+                LocalF[3] = function.fun(RZ[elemArr[3]], tNow, Params[elem.NMat]);
 
                 double[] LocalB = GenLocal(LocalF, RZ[elemArr[0]].R, hr, hz);
                 //for (int i = 0; i < elemArr.Length; i++)

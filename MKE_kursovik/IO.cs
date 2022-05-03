@@ -12,11 +12,12 @@ namespace MKE_kursovik
         public int NumR;
         public int NumZ;
         public int NumElem;
+        public int NumPointSource;
 
-        private int NumRDown;
-        private int NumRUp;
-        private int NumZDown;
-        private int NumZUp;
+        public int NumRDown;
+        public int NumRUp;
+        public int NumZDown;
+        public int NumZUp;
 
         //public double Sigma;
         //public double Mu;
@@ -206,7 +207,8 @@ namespace MKE_kursovik
                     }
                     HzTmp /= DiscZ;
                 }
-                Console.WriteLine('y');
+                NumPointSource = NumR * (NumZDown - 1) - 1 + NumRDown;
+                RZ[NumPointSource].NumOfFun = 1;
             }
 
 
@@ -216,30 +218,51 @@ namespace MKE_kursovik
                 throw;
             }
         }
+        
         private void InputBound1()
         {
-            string path = "Bound1.txt";
-            try
-            {
-                using (StreamReader sr = new StreamReader(path))
-                {
-                    int NumPeaks = int.Parse(sr.ReadLine());
-                    int NumVertex, Side;
-                    Bound1 = new List<S1>();
-                    for (int i = 0; i < NumPeaks; i++)
-                    {
-                        var a = sr.ReadLine().Split();
-                        NumVertex = int.Parse(a[0]);
-                        Side = int.Parse(a[1]);
-                        Bound1.Add(new S1(NumVertex, Side));
-                    }
-                }
+            Bound1 = new List<S1>();
+            for (int i = 0; i < NumR - 1; i++)
+			{
+                Bound1.Add(new S1(i, 0));
+			}
+
+            int num = NumR * NumZ;
+
+            for (int i = num - 2; i > num - 1 - NumZ; i--)
+			{
+                Bound1.Add(new S1(i, 1));
+			}
+
+            for(int i = NumR - 1; i < num; i+=NumR)
+			{
+                Bound1.Add(new S1(i, 2));
             }
-            catch (IOException e)
-            {
-                Console.WriteLine("S1 input exeption");
-                Console.WriteLine(e.Message);
-            }
+
+
+            //string path = "Bound1.txt";
+            //try
+            //{
+            //    using (StreamReader sr = new StreamReader(path))
+            //    {
+            //        int NumPeaks = int.Parse(sr.ReadLine());
+            //        int NumVertex, Side;
+            //        Bound1 = new List<S1>();
+            //        for (int i = 0; i < NumPeaks; i++)
+            //        {
+            //            var a = sr.ReadLine().Split();
+            //            NumVertex = int.Parse(a[0]);
+            //            Side = int.Parse(a[1]);
+            //            Bound1.Add(new S1(NumVertex, Side));
+
+            //        }
+            //    }
+            //}
+            //catch (IOException e)
+            //{
+            //    Console.WriteLine("S1 input exeption");
+            //    Console.WriteLine(e.Message);
+            //}
         }
 
         private void InputBound2()
@@ -280,8 +303,9 @@ namespace MKE_kursovik
                     Params = new List<Parameter>();
                     for (int i = 0; i < num; i++)
                     {
-                        double sigma = double.Parse(sr.ReadLine());
-                        double Mu = double.Parse(sr.ReadLine());
+                        var tmp = sr.ReadLine().Split();
+                        double sigma = double.Parse(tmp[0]);
+                        double Mu = double.Parse(tmp[1]);
                         Params.Add(new Parameter(sigma, Mu));
                     }
                 }
@@ -296,22 +320,22 @@ namespace MKE_kursovik
         private void InputNumofPram()
         {
             NumOfParameters = new int[(NumZ - 1) * (NumR - 1)];
-            string path = "Param_on_Element.txt";
-            try
-            {
-                using (StreamReader sr = new StreamReader(path, Encoding.Default))
-                {
-                    for (int i = 0; i < NumOfParameters.Length; i++)
-                    {
-                        NumOfParameters[i] = int.Parse(sr.ReadLine());
-                    }
-                }
-            }
-            catch (IOException e)
-            {
-                Console.WriteLine("Param input exeption");
-                Console.WriteLine(e.Message);
-            }
+            //string path = "Param_on_Element.txt";
+            //try
+            //{
+            //    using (StreamReader sr = new StreamReader(path, Encoding.Default))
+            //    {
+            //        for (int i = 0; i < NumOfParameters.Length; i++)
+            //        {
+            //            NumOfParameters[i] = int.Parse(sr.ReadLine());
+            //        }
+            //    }
+            //}
+            //catch (IOException e)
+            //{
+            //    Console.WriteLine("Param input exeption");
+            //    Console.WriteLine(e.Message);
+            //}
         }
 
         private void InputGrid()
@@ -350,7 +374,9 @@ namespace MKE_kursovik
                 using (StreamReader sr = new StreamReader(path))
                 {
                     var tmp = sr.ReadLine().Split();
-                    PointSource = new Vertex(double.Parse(tmp[0]), double.Parse(tmp[1]));
+                    
+                    //NumPointSource = int.Parse(tmp[2]);
+                    PointSource = new Vertex(double.Parse(tmp[0]), double.Parse(tmp[1]), 1);
 
                     tmp = sr.ReadLine().Split();
                     NumRDown = int.Parse(tmp[0]);
