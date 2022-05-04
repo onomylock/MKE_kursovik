@@ -16,11 +16,11 @@ namespace MKE_kursovik
         GlobalVectorB rightB;
         int[] ia, ja;
         int N;
-        IO io;
+        //IO io;
 
         public Solve(IO io)
         {
-            this.io = io;
+            //this.io = io;
             Mesh mesh = new Mesh(io.Elements, io.RZ);
             (ia, ja) = mesh.BuildPotrait();
             M = new GlobalMatrixM(ia.Length, ja.Length);
@@ -39,7 +39,6 @@ namespace MKE_kursovik
             double[] Q_tmp = new double[ia.Length - 1];
             for (int i = 0; i < Q_tmp.Length; i++)
             {
-                
                 Q_tmp[i] = function.AzTrue(io.RZ[i], io.Time[0]);
                 //Q_tmp[i] = function.fun(io.RZ[i].R, io.RZ[i].Z, io.Time[0]);
             }
@@ -118,11 +117,11 @@ namespace MKE_kursovik
                 //    //writer.WriteLine("square error = " + sum.ToString());
                 //}
                 int start = io.NumR * (io.NumZDown - 1);
-                //for (int j = start + io.NumRDown; j < start + io.NumR; j++)
-                for (int j = 0; j < Q[1].Length; j++)
+                for (int j = start + io.NumRDown; j < start + io.NumR; j++)
+                //for (int j = 0; j < Q[1].Length; j++)
                 {
-                    
                     writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
+                    //writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
                 }
 
                 writer.Close();

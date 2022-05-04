@@ -19,6 +19,11 @@ namespace MKE_kursovik
         public int NumZDown;
         public int NumZUp;
 
+        public double DiscRUp;
+        public double DiscZUp;
+        public double DiscRDown;
+        public double DiscZDown;
+
         //public double Sigma;
         //public double Mu;
         private double TimeStart;
@@ -119,7 +124,7 @@ namespace MKE_kursovik
 
         private void GetGridPointSource()
         {
-            double HrTmpDouwn = HrDown;
+            double HrTmpDown = HrDown;
             double HrTmpUp = HrUp;
             double HzTmp = HzDown;
             double Ri, Zi;
@@ -133,7 +138,7 @@ namespace MKE_kursovik
                     else if (i == NumZDown - 1) Zi = PointSource.Z;
                     else Zi = RZ[RZ.Count - 1].Z + HzTmp;
                     HrTmpUp = HrUp;
-                    HrTmpDouwn = HrDown;
+                    HrTmpDown = HrDown;
                     for (int j = 0; j < NumRDown; j++)
                     {
                         if (j == 0 && i == 0) continue;
@@ -143,10 +148,10 @@ namespace MKE_kursovik
                             continue;
                         }
                         else if (j == NumRDown - 1) Ri = PointSource.R;
-                        else Ri = RZ[RZ.Count - 1].R + HrTmpDouwn;
+                        else Ri = RZ[RZ.Count - 1].R + HrTmpDown;
 
                         RZ.Add(new Vertex(Ri, Zi));
-                        HrTmpDouwn *= DiscR;
+                        HrTmpDown *= DiscRDown;
                     }
 
                     for (int j = 0; j < NumRUp; j++)
@@ -161,9 +166,10 @@ namespace MKE_kursovik
                         else Ri = RZ[RZ.Count - 1].R + HrTmpUp;
 
                         RZ.Add(new Vertex(Ri, Zi));
-                        HrTmpUp /= DiscR;
+                        HrTmpUp *= DiscRUp;
                     }
-                    HzTmp *= DiscZ;
+                    if (i == 0) continue;
+                    HzTmp *= DiscZDown;
                 }
 
                 HzTmp = HzUp;
@@ -179,7 +185,7 @@ namespace MKE_kursovik
                     if (i == NumZUp - 1) Zi = Z1;
                     else Zi = RZ[RZ.Count - 1].Z + HzTmp;
                     HrTmpUp = HrUp;
-                    HrTmpDouwn = HrDown;
+                    HrTmpDown = HrDown;
                     for (int j = 0; j < NumRDown; j++)
                     {
                         //if (j == 0 && i == 0) continue;
@@ -189,10 +195,10 @@ namespace MKE_kursovik
                             continue;
                         }
                         else if (j == NumRDown - 1) Ri = PointSource.R;
-                        else Ri = RZ[RZ.Count - 1].R + HrTmpDouwn;
+                        else Ri = RZ[RZ.Count - 1].R + HrTmpDown;
 
                         RZ.Add(new Vertex(Ri, Zi));
-                        HrTmpDouwn *= DiscR;
+                        HrTmpDown *= DiscRDown;
                     }
 
                     for (int j = 0; j < NumRUp; j++)
@@ -203,9 +209,9 @@ namespace MKE_kursovik
                         else Ri = RZ[RZ.Count - 1].R + HrTmpUp;
 
                         RZ.Add(new Vertex(Ri, Zi));
-                        HrTmpUp /= DiscR;
+                        HrTmpUp *= DiscRUp;
                     }
-                    HzTmp /= DiscZ;
+                    HzTmp *= DiscZUp;
                 }
                 NumPointSource = NumR * (NumZDown - 1) - 1 + NumRDown;
                 RZ[NumPointSource].NumOfFun = 1;
@@ -393,8 +399,10 @@ namespace MKE_kursovik
                     HzUp = double.Parse(tmp[3]);
 
                     tmp = sr.ReadLine().Split();
-                    DiscR = double.Parse(tmp[0]);
-                    DiscZ = double.Parse(tmp[1]);
+                    DiscRDown = double.Parse(tmp[0]);
+                    DiscRUp = double.Parse(tmp[1]);
+                    DiscZDown = double.Parse(tmp[2]);
+                    DiscZUp = double.Parse(tmp[3]);
 
                     tmp = sr.ReadLine().Split();
                     R0 = double.Parse(tmp[0]);
