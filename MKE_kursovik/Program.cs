@@ -64,35 +64,35 @@ namespace MKE_kursovik
             Program program = new Program();
             program.io = new IO();
             program.solve = new(program.io);
-            List<Vertex> Points = new List<Vertex>();
-            int layer;
+    //        List<Vertex> Points = new List<Vertex>();
+    //        int layer;
 
-            Points.Add(new Vertex(1.3, 1.2));
-            Points.Add(new Vertex(1.7, 1.6));
-            Points.Add(new Vertex(1.1, 1.4));
-            Points.Add(new Vertex(1.4, 1.2));
-            Points.Add(new Vertex(1.1, 1.9));
-            Points.Add(new Vertex(1.0, 1.0));
+    //        Points.Add(new Vertex(1.3, 1.2));
+    //        Points.Add(new Vertex(1.7, 1.6));
+    //        Points.Add(new Vertex(1.1, 1.4));
+    //        Points.Add(new Vertex(1.4, 1.2));
+    //        Points.Add(new Vertex(1.1, 1.9));
+    //        Points.Add(new Vertex(1.0, 1.0));
 
-            //Console.WriteLine("Write R coordinate:");
-            //Point.R = Convert.ToDouble(Console.ReadLine());
-            //Console.WriteLine("Write Z coordinate:");
-            //Point.Z = Convert.ToDouble(Console.ReadLine());
-            Console.WriteLine("Write layer:");
-            layer = Convert.ToInt32(Console.ReadLine());
-            //double? Afi = program.APoint(Point, layer);
+    //        //Console.WriteLine("Write R coordinate:");
+    //        //Point.R = Convert.ToDouble(Console.ReadLine());
+    //        //Console.WriteLine("Write Z coordinate:");
+    //        //Point.Z = Convert.ToDouble(Console.ReadLine());
+    //        Console.WriteLine("Write layer:");
+    //        layer = Convert.ToInt32(Console.ReadLine());
+    //        //double? Afi = program.APoint(Point, layer);
          
-            using (StreamWriter writer = new StreamWriter("Point.txt", false))
-            {
-                double? Afi;
-                writer.WriteLine("Layer = " + layer.ToString());
-                foreach (var Point in Points)
-				{
-                    Afi = program.APoint(Point, layer);
-                    writer.WriteLine("R = " + Point.R.ToString() + "\tZ = " + Point.Z.ToString() + "\t Function = " + Afi.ToString());
-                }
-                writer.Close();
-            }
+    //        using (StreamWriter writer = new StreamWriter("Point.txt", false))
+    //        {
+    //            double? Afi;
+    //            writer.WriteLine("Layer = " + layer.ToString());
+    //            foreach (var Point in Points)
+				//{
+    //                Afi = program.APoint(Point, layer);
+    //                writer.WriteLine("R = " + Point.R.ToString() + "\tZ = " + Point.Z.ToString() + "\t Function = " + Afi.ToString());
+    //            }
+    //            writer.Close();
+    //        }
 
         }
     }

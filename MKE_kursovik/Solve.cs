@@ -13,6 +13,7 @@ namespace MKE_kursovik
         GlobalMatrixM M;
         GlobalMatrixG G;
         GlobalMatrixA A;
+        GlobalMatrixM0 M0;
         GlobalVectorB rightB;
         int[] ia, ja;
         int N;
@@ -25,11 +26,13 @@ namespace MKE_kursovik
             (ia, ja) = mesh.BuildPotrait();
             M = new GlobalMatrixM(ia.Length, ja.Length);
             G = new GlobalMatrixG(ia.Length, ja.Length);
+            M0 = new GlobalMatrixM0(ia.Length, ja.Length);
             A = new GlobalMatrixA(ia.Length, ja.Length);
             GenGlobalMatrix gen = new GenGlobalMatrix();
             gen.AddToGlobal(G, io.RZ, io.Elements, io.Params, ia, ja);
             gen.AddToGlobal(M, io.RZ, io.Elements, io.Params, ia, ja);
-            A.GenGolbalMatrixA(G, M, io.Time[1] - io.Time[0]);
+            gen.AddToGlobal(M0, io.RZ, io.Elements, io.Params, ia, ja);
+            A.GenGolbalMatrixA(G, M, M0, io.Time[1] - io.Time[0]);
             N = io.RZ.Count();
             Function function = new Function();
 
@@ -52,7 +55,7 @@ namespace MKE_kursovik
             for (int i = 1; i < io.Time.Count; i++)
             {
                 rightB = new GlobalVectorB();
-                A.GenGolbalMatrixA(G, M, io.Time[i] - io.Time[i - 1]);
+                A.GenGolbalMatrixA(G, M, M0, io.Time[i] - io.Time[i - 1]);
                 rightB.GenGlobalB(M, io.RZ, io.Elements, ia, ja, Q[i - 1], io.Time[i], io.Time[i] - io.Time[i - 1], io.Params);
                 Q_tmp = new double[N];
 
@@ -147,7 +150,7 @@ namespace MKE_kursovik
                     ggl[k] = (ggl[k] - sumal) / di[j];
                     sumdi += ggl[k] * ggu[k];
                 }
-                di[i] = Math.Sqrt(di[i] - sumdi);
+                di[i] = Math.Sqrt(Math.Abs(di[i] - sumdi));
             }
         }
 

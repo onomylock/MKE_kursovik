@@ -13,7 +13,7 @@ namespace MKE_kursovik
         public int NumZ;
         public int NumElem;
         //public double Sigma;
-        //public double Lambda;
+        //public double Mu;
         private double TimeStart;
         private double TimeEnd;
         private double R0;
@@ -130,8 +130,8 @@ namespace MKE_kursovik
                     for (int i = 0; i < num; i++)
                     {
                         double sigma = double.Parse(sr.ReadLine());
-                        double lambda = double.Parse(sr.ReadLine());
-                        Params.Add(new Parameter(sigma, lambda));
+                        double Mu = double.Parse(sr.ReadLine());
+                        Params.Add(new Parameter(sigma, Mu));
                     }
                 }
             }
