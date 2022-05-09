@@ -67,17 +67,19 @@ namespace MKE_kursovik
     {
         public double fun(double r, double z, double t, Parameter param)
         {
+            return 1 / r;
             //return -4;
             //return 3 / (r * r);
-            return - 9 * r;
+            //return - 9 * r;
             //return -16 * r * r;
             //return -2 * Math.Sin(r * r + 3 * z) - 4 * r * r * Math.Cos(r * r + 3 * z) - Math.Cos(t);
         }
 
         public double AzTrue(double r, double z, double t)
         {
+            return r;
             //return r * r;
-            return r * r * r;
+            //return r * r * r;
             //return r * r * r * r;
             //return r * r * r * r;
             //return Math.Cos(r * r + 3 * z) - Math.Sin(t);

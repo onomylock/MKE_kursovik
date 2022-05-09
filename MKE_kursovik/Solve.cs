@@ -106,8 +106,8 @@ namespace MKE_kursovik
                         sum += Math.Pow(sum_tmp, 2);
                         //writer.WriteLine(Q[i][j].ToString() + "\t\t\t\t\t" + Az_true[j].ToString() + "\t\t\t\t\t" + sum_tmp.ToString());
                     }
-                    //sum = Math.Sqrt(sum);
-                    sum = Math.Sqrt(sum) / (double)Q[i].Length;
+                    sum = Math.Sqrt(sum);
+                    //sum = Math.Sqrt(sum) / (double)Q[i].Length;
                     writer.WriteLine("square error = " + sum.ToString());
                 }
                 writer.Close();
