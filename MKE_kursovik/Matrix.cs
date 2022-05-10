@@ -67,8 +67,9 @@ namespace MKE_kursovik
     {
         public double fun(double r, double z, double t, Parameter param)
         {
-            return 1 / r;
-            //return -4;
+            //return 1 / r;
+            return -3;
+            //return 0;
             //return 3 / (r * r);
             //return - 9 * r;
             //return -16 * r * r;
@@ -77,8 +78,9 @@ namespace MKE_kursovik
 
         public double AzTrue(double r, double z, double t)
         {
-            return r;
-            //return r * r;
+            //return z;
+            //return r;
+            return r * r;
             //return r * r * r;
             //return r * r * r * r;
             //return r * r * r * r;
@@ -243,15 +245,15 @@ namespace MKE_kursovik
         public double[,] GenLocal(double rp, Parameter param, double Hz, double Hr)
         {
             double[,] LocalG = new double[4, 4];
-            double a1 = (param.Mu * Hz * rp) / (6 * Hr),
-                    a2 = (param.Mu * Hz) / (12),
-                    a3 = (param.Mu * Hr * rp) / (6 * Hz),
-                    a4 = (param.Mu * Hr * Hr) / (12 * Hz);
-            //double a1 = (param.Mu * Hz) / (6 * Hr),
-            //        a2 = (param.Mu * Hz) / (12),
-            //        a3 = (param.Mu * Hr) / (6 * Hz),
-            //        a4 = (param.Mu * Hr) / (12 * Hz);
-            LocalG[0, 0] = 2 * a1 + 2 * a2 + 2 * a3 + 1 * a4;
+			double a1 = (param.Mu * Hz * rp) / (6 * Hr),
+					a2 = (param.Mu * Hz) / (12),
+					a3 = (param.Mu * Hr * rp) / (6 * Hz),
+					a4 = (param.Mu * Hr * Hr) / (12 * Hz);
+			//double a1 = (param.Mu * Hz) / (6 * Hr),
+			//		a2 = (param.Mu * Hz) / (12),
+			//		a3 = (param.Mu * Hr) / (6 * Hz),
+			//		a4 = (param.Mu * Hr) / (12 * Hz);
+			LocalG[0, 0] = 2 * a1 + 2 * a2 + 2 * a3 + 1 * a4;
             LocalG[0, 1] = -2 * a1 - 2 * a2 + 1 * a3 + 1 * a4;
             LocalG[0, 2] = 1 * a1 + 1 * a2 - 2 * a3 - 1 * a4;
             LocalG[0, 3] = -1 * a1 - 1 * a2 - 1 * a3 - 1 * a4;
@@ -341,19 +343,19 @@ namespace MKE_kursovik
 			LocalM[0, 2] = param.Mu * LocalMr[0, 0] * LocalMz[0, 1];
             LocalM[0, 3] = param.Mu * LocalMr[0, 1] * LocalMz[0, 1];
 
-			LocalM[1, 0] = LocalM[0, 1];
+			LocalM[1, 0] = param.Mu * LocalMr[0, 1] * LocalMz[0, 0];
             LocalM[1, 1] = param.Mu * LocalMr[1, 1] * LocalMz[0, 0];
 			LocalM[1, 2] = param.Mu * LocalMr[1, 0] * LocalMz[0, 1];
             LocalM[1, 3] = param.Mu * LocalMr[1, 1] * LocalMz[0, 1];
 
-			LocalM[2, 0] = LocalM[0, 2];
-			LocalM[2, 1] = LocalM[1, 2];
+			LocalM[2, 0] = param.Mu * LocalMr[0, 0] * LocalMz[0, 1];
+            LocalM[2, 1] = param.Mu * LocalMr[1, 0] * LocalMz[0, 1];
             LocalM[2, 2] = param.Mu * LocalMr[0, 0] * LocalMz[1, 1];
             LocalM[2, 3] = param.Mu * LocalMr[0, 1] * LocalMz[1, 1];
 
-			LocalM[3, 0] = LocalM[0, 3];
-			LocalM[3, 1] = LocalM[1, 3];
-			LocalM[3, 2] = LocalM[2, 3];
+			LocalM[3, 0] = param.Mu * LocalMr[0, 1] * LocalMz[0, 1];
+            LocalM[3, 1] = param.Mu * LocalMr[1, 1] * LocalMz[0, 1];
+            LocalM[3, 2] = param.Mu * LocalMr[0, 1] * LocalMz[1, 1];
             LocalM[3, 3] = param.Mu * LocalMr[1, 1] * LocalMz[1, 1];
 
 			return LocalM;
@@ -419,30 +421,29 @@ namespace MKE_kursovik
 
         public void GenGolbalMatrixA(IGlobalMatrix G, IGlobalMatrix M, IGlobalMatrix M0, double Th)
         {
-            //for (int i = 0; i < ggl.Length; i++)
-            //{
-            //	ggl[i] = G.ggl[i] + M.ggl[i] / Th - M0.ggl[i];
-            //	ggu[i] = G.ggu[i] + M.ggu[i] / Th - M0.ggu[i];
-            //}
+			for (int i = 0; i < ggl.Length; i++)
+			{
+				ggl[i] = G.ggl[i] + M.ggl[i] / Th + M0.ggl[i];
+				ggu[i] = G.ggu[i] + M.ggu[i] / Th + M0.ggu[i];
+			}
 
-            //for (int i = 0; i < di.Length; i++)
-            //{
-            //	di[i] = G.di[i] + M.di[i] / Th - M0.di[i];
-            //}
-            for (int i = 0; i < ggl.Length; i++)
-            {
-                ggl[i] = G.ggl[i] + M.ggl[i] / Th;
-                ggu[i] = G.ggu[i] + M.ggu[i] / Th;
-            }
+			for (int i = 0; i < di.Length; i++)
+			{
+				di[i] = G.di[i] + M.di[i] / Th + M0.di[i];
+			}
+			//for (int i = 0; i < ggl.Length; i++)
+			//{
+			//    ggl[i] = G.ggl[i] + M.ggl[i] / Th;
+			//    ggu[i] = G.ggu[i] + M.ggu[i] / Th;
+			//}
 
-            for (int i = 0; i < di.Length; i++)
-            {
-                di[i] = G.di[i] + M.di[i] / Th;
-            }
-        }
+			//for (int i = 0; i < di.Length; i++)
+			//{
+			//    di[i] = G.di[i] + M.di[i] / Th;
+			//}
+		}
     }
 
-   
     public class Mesh
     {
         readonly IEnumerable<IElement> Elements;

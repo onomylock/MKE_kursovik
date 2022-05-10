@@ -102,12 +102,23 @@ namespace MKE_kursovik
 					}
                     for (int j = 0; j < Q[i].Length; j++)
                     {
+                        bool flag = false;
+                        foreach(var s1 in io.Bound1)
+						{
+                            if (s1.NumVertex == j)
+							{
+                                flag = true;
+                                continue;
+							}
+                        }
+                        if (flag) continue;
+                        
                         double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
                         sum += Math.Pow(sum_tmp, 2);
                         //writer.WriteLine(Q[i][j].ToString() + "\t\t\t\t\t" + Az_true[j].ToString() + "\t\t\t\t\t" + sum_tmp.ToString());
                     }
-                    sum = Math.Sqrt(sum);
-                    //sum = Math.Sqrt(sum) / (double)Q[i].Length;
+                    //sum = Math.Sqrt(sum);
+                    sum = Math.Sqrt(sum) / (double)(Q[i].Length - io.Bound1.Count);
                     writer.WriteLine("square error = " + sum.ToString());
                 }
                 writer.Close();
@@ -150,7 +161,7 @@ namespace MKE_kursovik
                     ggl[k] = (ggl[k] - sumal) / di[j];
                     sumdi += ggl[k] * ggu[k];
                 }
-                di[i] = Math.Sqrt(Math.Abs(di[i] - sumdi));
+                di[i] = Math.Sqrt(di[i] - sumdi);
             }
         }
 
