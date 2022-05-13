@@ -13,6 +13,7 @@ namespace MKE_kursovik
         GlobalMatrixM M;
         GlobalMatrixG G;
         GlobalMatrixA A;
+        GlobalMatrixM0 M0;
         GlobalVectorB rightB;
         int[] ia, ja;
         int N;
@@ -25,11 +26,13 @@ namespace MKE_kursovik
             (ia, ja) = mesh.BuildPotrait();
             M = new GlobalMatrixM(ia.Length, ja.Length);
             G = new GlobalMatrixG(ia.Length, ja.Length);
+            M0 = new GlobalMatrixM0(ia.Length, ja.Length);
             A = new GlobalMatrixA(ia.Length, ja.Length);
             GenGlobalMatrix gen = new GenGlobalMatrix();
             gen.AddToGlobal(G, io.RZ, io.Elements, io.Params, ia, ja);
             gen.AddToGlobal(M, io.RZ, io.Elements, io.Params, ia, ja);
-            A.GenGolbalMatrixA(G, M, io.Time[1] - io.Time[0]);
+            gen.AddToGlobal(M0, io.RZ, io.Elements, io.Params, ia, ja);
+            A.GenGolbalMatrixA(G, M, M0, io.Time[1] - io.Time[0]);
             N = io.RZ.Count();
             Function function = new Function();
 
@@ -52,7 +55,7 @@ namespace MKE_kursovik
             for (int i = 1; i < io.Time.Count; i++)
             {
                 rightB = new GlobalVectorB();
-                A.GenGolbalMatrixA(G, M, io.Time[i] - io.Time[i - 1]);
+                A.GenGolbalMatrixA(G, M, M0, io.Time[i] - io.Time[i - 1]);
                 rightB.GenGlobalB(M, io.RZ, io.Elements, ia, ja, Q[i - 1], io.Time[i], io.Time[i] - io.Time[i - 1], io.Params);
                 Q_tmp = new double[N];
 
@@ -81,8 +84,8 @@ namespace MKE_kursovik
 
                 foreach (var s1 in io.Bound1)
                 {
-                    A.di[s1.NumVertex] = 1.0e50;
-                    rightB.B[s1.NumVertex] = 1.0e50 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
+                    A.di[s1.NumVertex] = 1.0e7;
+                    rightB.B[s1.NumVertex] = 1.0e7 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
                 }
                 Q.Add(LOS());
             }
@@ -161,42 +164,49 @@ namespace MKE_kursovik
 
         private void LUsq(double[] ggl, double[] ggu, double[] di)
         {
-            for (int i = 0; i < N; i++)
-            {
-                double sumdi = 0;
-                int i0 = ia[i];
-                int i1 = ia[i + 1];
-                for (int k = i0; k < i1; k++) // к показывает сколько элементов мы обработали в i строке 
+			try
+			{
+                for (int i = 0; i < N; i++)
                 {
-                    int j = ja[k];// номер столбца  к-го элемента i строки 
-                    double sumal = 0;
-                    double sumau = 0;
-
-                    int j0 = ia[j];
-                    int j1 = ia[j + 1];
-
-                    int ki = i0;
-                    int kj = j0;
-                    for (; ki < k && kj < j1;) // пока есть элементы которые предшествуют к-му элементу
+                    double sumdi = 0;
+                    int i0 = ia[i];
+                    int i1 = ia[i + 1];
+                    for (int k = i0; k < i1; k++) // к показывает сколько элементов мы обработали в i строке 
                     {
-                        int j_kl = ja[ki];
-                        int j_ku = ja[kj];
-                        if (j_kl == j_ku) // чтобы рассматриваемые элементы не были нулевыми 
-                        {
-                            sumal += ggu[kj] * ggl[ki];
-                            sumau += ggu[ki] * ggl[kj];
-                            ki++; kj++;
-                        }
-                        else if (j_kl < j_ku) ki++;
-                        else kj++;
-                    }
+                        int j = ja[k];// номер столбца  к-го элемента i строки 
+                        double sumal = 0;
+                        double sumau = 0;
 
-                    ggu[k] = (ggu[k] - sumau) / di[j];
-                    ggl[k] = (ggl[k] - sumal) / di[j];
-                    sumdi += ggl[k] * ggu[k];
+                        int j0 = ia[j];
+                        int j1 = ia[j + 1];
+
+                        int ki = i0;
+                        int kj = j0;
+                        for (; ki < k && kj < j1;) // пока есть элементы которые предшествуют к-му элементу
+                        {
+                            int j_kl = ja[ki];
+                            int j_ku = ja[kj];
+                            if (j_kl == j_ku) // чтобы рассматриваемые элементы не были нулевыми 
+                            {
+                                sumal += ggu[kj] * ggl[ki];
+                                sumau += ggu[ki] * ggl[kj];
+                                ki++; kj++;
+                            }
+                            else if (j_kl < j_ku) ki++;
+                            else kj++;
+                        }
+
+                        ggu[k] = (ggu[k] - sumau) / di[j];
+                        ggl[k] = (ggl[k] - sumal) / di[j];
+                        sumdi += ggl[k] * ggu[k];
+                    }
+                    di[i] = Math.Sqrt(Math.Abs(di[i] - sumdi));
                 }
-                di[i] = Math.Sqrt(di[i] - sumdi);
             }
+            catch
+			{
+                Console.WriteLine("NaN Value Exeption!");
+			}
         }
 
         private double[] MultMatrixVector(double[] param)
@@ -266,7 +276,7 @@ namespace MKE_kursovik
 
         private double[] LOS()
         {
-            double eps = 1e-60, norm, alfa = 0, beta = 0;
+            double eps = 1e-10, norm, alfa = 0, beta = 0;
             int k = 0, max_iter = 1000;
 
             double[] mult1, mult2, R, Z, P, ggl, ggu, di, Q_tmp;
@@ -325,7 +335,7 @@ namespace MKE_kursovik
                     Z[i] = beta * Z[i] + mult2[i];
                     P[i] = mult1[i] + beta * P[i];
                 }
-                norm = Math.Sqrt(ScalarProduct(R, R));
+                norm = Math.Sqrt(ScalarProduct(R, R)) / N;
 
                 //Console.WriteLine("Iteration: " + (k + 1).ToString() + "\tError: " + norm.ToString());
             }
