@@ -334,7 +334,7 @@ namespace MKE_kursovik
             double[,] LocalMr = new double[2, 2];
             double[,] LocalMz = new double[2, 2];
             double dr = rp / Hr,
-                    log = Math.Log(1 + 1.0 / dr);
+                    log = Math.Log(1.0 + 1.0 / dr);
 
             LocalMr[0, 0] = log * Math.Pow((1 + dr), 2) - dr - 3.0 / 2.0;
             LocalMr[0, 1] = -log * dr * (1 + dr) + dr + 1.0 / 2.0;
@@ -431,27 +431,27 @@ namespace MKE_kursovik
 
         public void GenGolbalMatrixA(IGlobalMatrix G, IGlobalMatrix M, IGlobalMatrix M0, double Th)
         {
-            for (int i = 0; i < ggl.Length; i++)
-            {
-                ggl[i] = G.ggl[i] + M.ggl[i] / Th + M0.ggl[i];
-                ggu[i] = G.ggu[i] + M.ggu[i] / Th + M0.ggu[i];
-            }
+			for (int i = 0; i < ggl.Length; i++)
+			{
+				ggl[i] = G.ggl[i] + M.ggl[i] / Th + M0.ggl[i];
+				ggu[i] = G.ggu[i] + M.ggu[i] / Th + M0.ggu[i];
+			}
 
-            for (int i = 0; i < di.Length; i++)
-            {
-                di[i] = G.di[i] + M.di[i] / Th + M0.di[i];
-            }
-            //for (int i = 0; i < ggl.Length; i++)
-            //{
-            //	ggl[i] = G.ggl[i] + M.ggl[i] / Th;
-            //	ggu[i] = G.ggu[i] + M.ggu[i] / Th;
-            //}
+			for (int i = 0; i < di.Length; i++)
+			{
+				di[i] = G.di[i] + M.di[i] / Th + M0.di[i];
+			}
+			//for (int i = 0; i < ggl.Length; i++)
+			//{
+			//	ggl[i] = G.ggl[i] + M.ggl[i] / Th;
+			//	ggu[i] = G.ggu[i] + M.ggu[i] / Th;
+			//}
 
-            //for (int i = 0; i < di.Length; i++)
-            //{
-            //	di[i] = G.di[i] + M.di[i] / Th;
-            //}
-        }
+			//for (int i = 0; i < di.Length; i++)
+			//{
+			//	di[i] = G.di[i] + M.di[i] / Th;
+			//}
+		}
     }
 
     public class Mesh

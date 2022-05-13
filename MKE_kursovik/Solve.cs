@@ -120,7 +120,8 @@ namespace MKE_kursovik
                 //    //writer.WriteLine("square error = " + sum.ToString());
                 //}
                 int start = io.NumR * (io.NumZDown - 1);
-                for (int j = start + io.NumRDown; j < start + io.NumR; j++)
+                //for (int j = start + io.NumRDown; j < start + io.NumR; j++)
+                for (int j = start; j < start + io.NumR; j++)
                 //for (int j = 0; j < Q[1].Length; j++)
                 {
                     writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
@@ -200,7 +201,7 @@ namespace MKE_kursovik
                         ggl[k] = (ggl[k] - sumal) / di[j];
                         sumdi += ggl[k] * ggu[k];
                     }
-                    di[i] = Math.Sqrt(Math.Abs(di[i] - sumdi));
+                    di[i] = Math.Sqrt(di[i] - sumdi);
                 }
             }
             catch
