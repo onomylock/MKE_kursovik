@@ -129,8 +129,9 @@ namespace MKE_kursovik
                     Params = new List<Parameter>();
                     for (int i = 0; i < num; i++)
                     {
-                        double sigma = double.Parse(sr.ReadLine());
-                        double Mu = double.Parse(sr.ReadLine());
+                        var tmp = sr.ReadLine().Split();
+                        double sigma = double.Parse(tmp[0]);
+                        double Mu = double.Parse(tmp[0]);
                         Params.Add(new Parameter(sigma, Mu));
                     }
                 }

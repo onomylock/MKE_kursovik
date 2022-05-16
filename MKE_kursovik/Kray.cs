@@ -23,13 +23,13 @@ namespace MKE_kursovik
             //return Bound.Z;
             //return Bound.R * Bound.R + Bound.Z + t;
             //return Bound.R * Bound.R * Bound.R;
-            return Bound.R * Bound.R;
-            //return Bound.R;
+            //return Bound.R * Bound.R;
+            return Bound.R;
             //return Bound.R * Bound.R * Bound.R * Bound.R;
             //return Bound.R + t * t;
             //return Math.Cos(Bound.R * Bound.R + 3 * Bound.Z) - Math.Sin(t);
             //return t * t;
-            //return 5;
+            //return 1;
         }
 
         public S1(int NumVertex, int Side)

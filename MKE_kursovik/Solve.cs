@@ -57,22 +57,22 @@ namespace MKE_kursovik
                 rightB = new GlobalVectorB();
                 A.GenGolbalMatrixA(G, M, M0, io.Time[i] - io.Time[i - 1]);
                 rightB.GenGlobalB(M, io.RZ, io.Elements, ia, ja, Q[i - 1], io.Time[i], io.Time[i] - io.Time[i - 1], io.Params);
-                Q_tmp = new double[N];
+    //            Q_tmp = new double[N];
 
-                for(int j = 0; j < N; j++)
-				{
-                    Q_tmp[j] += M.di[j] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
-                    for(int k = ia[j]; k < ia[j + 1]; k++)
-					{
-                        int l = ja[k];
-                        Q_tmp[j] += M.ggl[k] * Q[i - 1][l] / (io.Time[i] - io.Time[i - 1]);
-                        Q_tmp[l] += M.ggu[k] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
-                    }
-				}
-				for (int j = 0; j < N; j++)
-				{
-					rightB.B[j] += Q_tmp[j] ;
-				}
+    //            for(int j = 0; j < N; j++)
+				//{
+    //                Q_tmp[j] += M.di[j] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
+    //                for(int k = ia[j]; k < ia[j + 1]; k++)
+				//	{
+    //                    int l = ja[k];
+    //                    Q_tmp[j] += M.ggl[k] * Q[i - 1][l] / (io.Time[i] - io.Time[i - 1]);
+    //                    Q_tmp[l] += M.ggu[k] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
+    //                }
+				//}
+				//for (int j = 0; j < N; j++)
+				//{
+				//	rightB.B[j] += Q_tmp[j];
+				//}
 
 				foreach (var s1 in io.Bound1)
 				{
@@ -82,7 +82,7 @@ namespace MKE_kursovik
 				Q.Add(LOS());
             }
 
-            using (StreamWriter writer = new StreamWriter("output.txt", false))
+            using ( StreamWriter writer = new StreamWriter("output.txt", false))
             {
                 //string text = "Afi      Afi(true)      Afi(err)";
                 //writer.WriteLine(text);
