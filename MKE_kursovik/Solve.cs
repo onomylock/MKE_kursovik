@@ -57,22 +57,6 @@ namespace MKE_kursovik
                 rightB = new GlobalVectorB();
                 A.GenGolbalMatrixA(G, M, M0, io.Time[i] - io.Time[i - 1]);
                 rightB.GenGlobalB(M, io.RZ, io.Elements, ia, ja, Q[i - 1], io.Time[i], io.Time[i] - io.Time[i - 1], io.Params);
-                //            Q_tmp = new double[N];
-
-                //            for(int j = 0; j < N; j++)
-                //{
-                //                Q_tmp[j] += M.di[j] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
-                //                for(int k = ia[j]; k < ia[j + 1]; k++)
-                //	{
-                //                    int l = ja[k];
-                //                    Q_tmp[j] += M.ggl[k] * Q[i - 1][l] / (io.Time[i] - io.Time[i - 1]);
-                //                    Q_tmp[l] += M.ggu[k] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
-                //                }
-                //}
-                //for (int j = 0; j < N; j++)
-                //{
-                //	rightB.B[j] += Q_tmp[j];
-                //}
 
                 foreach (var s2 in io.Bound2)
                 {
@@ -84,114 +68,34 @@ namespace MKE_kursovik
 
                 foreach (var s1 in io.Bound1)
                 {
-                    A.di[s1.NumVertex] = 1.0e11;
-                    rightB.B[s1.NumVertex] = 1.0e11 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
+                    A.di[s1.NumVertex] = 1.0e12;
+                    rightB.B[s1.NumVertex] = 1.0e12 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
                 }
                 Q.Add(LOS());
             }
 
             using (StreamWriter writer = new StreamWriter("output.txt", false))
             {
-                //string text = "Afi      Afi(true)      Afi(err)";
-                //writer.WriteLine(text);
+				//for (int i = 1; i < io.Time.Count; i++)
+				//{
+					
+				//	for (int j = 0; j < Q[i].Length; j++)
+				//	{
+				//		writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[i][j].ToString());
+				//	}
+				//}
 
-                //for (int i = 1; i < io.Time.Count; i++)
-                //{
-                //    //writer.WriteLine("Time = " + io.Time[i].ToString());
-                //    //double[] Az_true = new double[Q[i].Length];
-                //    //double sum = 0;
-                //    //for (int k = 0; k < io.Elements.Count; k++)
-                //    //{
-                //    //    for (int j = 0; j < 4; j++)
-                //    //    {
-                //    //        int l = io.Elements[k].VertexArr.ToArray()[j];
-                //    //        Az_true[l] = function.AzTrue(io.RZ[l], io.Time[i]);
-                //    //    }
-                //    //}
-
-                //    for (int j = 0; j < Q[i].Length; j++)
-                //    {
-                //        //double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
-                //        //sum += Math.Pow(sum_tmp, 2);
-                //        writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[i][j].ToString());
-                //    }
-                //    //sum = Math.Sqrt(sum);
-                //    //sum = Math.Sqrt(sum) / (double)Q[i].Length;
-                //    //writer.WriteLine("square error = " + sum.ToString());
-                //}
-                int start = io.NumR * (io.NumZDown - 1);
-                //for (int j = start + io.NumRDown; j < start + io.NumR; j++)
-                for (int j = start; j < start + io.NumR; j++)
-                //for (int j = 0; j < Q[1].Length; j++)
-                {
-                    writer.WriteLine("Time = " + io.Time[i].ToString());
-                    double[] Az_true = new double[Q[i].Length];
-                    double sum = 0;
-                    for (int k = 0; k < io.Elements.Count; k++)
-                    {
-                        for (int j = 0; j < 4; j++)
-                        {
-                            int l = io.Elements[k].VertexArr.ToArray()[j];
-                            Az_true[l] = function.AzTrue(io.RZ[l].R, io.RZ[l].Z, io.Time[i]);
-                        }
-                    }
-                    for (int j = 0; j < Q[i].Length; j++)
-                    {
-                        bool flag = false;
-                        foreach (var s1 in io.Bound1)
-                        {
-                            if (s1.NumVertex == j)
-                            {
-                                flag = true;
-                                continue;
-                            }
-                        }
-                        if (flag) continue;
-
-                        double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
-                        sum += Math.Pow(sum_tmp, 2);
-                        //writer.WriteLine(Q[i][j].ToString() + "\t\t\t\t\t" + Az_true[j].ToString() + "\t\t\t\t\t" + sum_tmp.ToString());
-                    }
-                    //sum = Math.Sqrt(sum);
-                    sum = Math.Sqrt(sum) / (double)(Q[i].Length - io.Bound1.Count);
-                    writer.WriteLine("square error = " + sum.ToString());
-                    //writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
-                    //writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
-                }
+				int start = io.NumR * (io.NumZDown - 1);
+				//for (int j = start + io.NumRDown; j < start + io.NumR; j++)
+				for (int j = start; j < start + io.NumR; j++)
+				//for (int j = 0; j < Q[1].Length; j++)
+				{
+					writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[5][j].ToString());
+					//writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
+				}
 
                 writer.Close();
             }
-
-            //using (StreamWriter writer = new StreamWriter("output.txt", false))
-            //{
-            //    //string text = "Afi      Afi(true)      Afi(err)";
-            //    //writer.WriteLine(text);
-
-            //    for (int i = 0; i < io.Time.Count; i++)
-            //    {
-            //        writer.WriteLine("Time = " + io.Time[i].ToString());
-            //        double[] Az_true = new double[Q[i].Length];
-            //        double sum = 0;
-            //        for (int k = 0; k < io.Elements.Count; k++)
-            //        {
-            //            for (int j = 0; j < 4; j++)
-            //            {
-            //                int l = io.Elements[k].VertexArr.ToArray()[j];
-            //                Az_true[l] = function.AzTrue(io.RZ[l], io.Time[i]);
-            //            }
-            //        }
-            //        for (int j = 0; j < Q[i].Length; j++)
-            //        {
-            //            double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
-            //            sum += Math.Pow(sum_tmp, 2);
-            //            //writer.WriteLine(Q[i][j].ToString() + "\t\t\t\t\t" + Az_true[j].ToString() + "\t\t\t\t\t" + sum_tmp.ToString());
-            //        }
-            //        //sum = Math.Sqrt(sum);
-            //        sum = Math.Sqrt(sum) / (double)Q[i].Length;
-            //        writer.WriteLine("square error = " + sum.ToString());
-            //    }
-            //    writer.Close();
-            //}
         }
 
         private void LUsq(double[] ggl, double[] ggu, double[] di)
@@ -308,7 +212,7 @@ namespace MKE_kursovik
 
         private double[] LOS()
         {
-            double eps = 1e-10, norm, alfa = 0, beta = 0;
+            double eps = 1e-15, norm, alfa = 0, beta = 0;
             int k = 0, max_iter = 1000;
 
             double[] mult1, mult2, R, Z, P, ggl, ggu, di, Q_tmp;

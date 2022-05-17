@@ -59,19 +59,21 @@ namespace MKE_kursovik
             {
                 InputGridPointSource();
                 GetGridPointSource();
+                InputBound1PointSource();
+                InputBound2PointSource();
             }
             else
             {
                 InputGrid();
                 GetGrid();
+                InputBound1();
+                InputBound2();
             }
 
             InputTime();
             GetTime();
             InputNumofPram();
             GetElements();
-            InputBound1();
-            InputBound2();
             InputPrams();
         }
 
@@ -226,6 +228,33 @@ namespace MKE_kursovik
         }
 
         private void InputBound1()
+		{
+			string path = "Bound1.txt";
+			try
+			{
+				using (StreamReader sr = new StreamReader(path))
+				{
+					int NumPeaks = int.Parse(sr.ReadLine());
+					int NumVertex, Side;
+					Bound1 = new List<S1>();
+					for (int i = 0; i < NumPeaks; i++)
+					{
+						var a = sr.ReadLine().Split();
+						NumVertex = int.Parse(a[0]);
+						Side = int.Parse(a[1]);
+						Bound1.Add(new S1(NumVertex, Side));
+
+					}
+				}
+			}
+			catch (IOException e)
+			{
+				Console.WriteLine("S1 input exeption");
+				Console.WriteLine(e.Message);
+			}
+		}
+
+        private void InputBound1PointSource()
         {
             Bound1 = new List<S1>();
             for (int i = 0; i < NumR - 1; i++)
@@ -244,35 +273,10 @@ namespace MKE_kursovik
             {
                 Bound1.Add(new S1(i, 2));
             }
-
-
-            //string path = "Bound1.txt";
-            //try
-            //{
-            //    using (StreamReader sr = new StreamReader(path))
-            //    {
-            //        int NumPeaks = int.Parse(sr.ReadLine());
-            //        int NumVertex, Side;
-            //        Bound1 = new List<S1>();
-            //        for (int i = 0; i < NumPeaks; i++)
-            //        {
-            //            var a = sr.ReadLine().Split();
-            //            NumVertex = int.Parse(a[0]);
-            //            Side = int.Parse(a[1]);
-            //            Bound1.Add(new S1(NumVertex, Side));
-
-            //        }
-            //    }
-            //}
-            //catch (IOException e)
-            //{
-            //    Console.WriteLine("S1 input exeption");
-            //    Console.WriteLine(e.Message);
-            //}
         }
 
-        private void InputBound2()
-        {
+        private void InputBound2PointSource()
+		{
             Bound2 = new List<S2>();
 
             int num = NumR * NumZ;
@@ -281,33 +285,34 @@ namespace MKE_kursovik
             {
                 Bound2.Add(new S2(i - NumR, i, 0));
             }
-
-            //string path = "Bound2.txt";
-            //try
-            //{
-            //    using (StreamReader sr = new StreamReader(path))
-            //    {
-            //        int NumBound = int.Parse(sr.ReadLine());
-            //        int NumVertex1, NumVertex2, Side;
-            //        Bound2 = new List<S2>();
-            //        for (int i = 0; i < NumBound; i++)
-            //        {
-            //            var a = sr.ReadLine().Split();
-            //            NumVertex1 = int.Parse(a[0]);
-            //            NumVertex2 = int.Parse(a[1]);
-            //            Side = int.Parse(a[2]);
-            //            Bound2.Add(new S2(NumVertex1, NumVertex2, Side));
-            //        }
-            //    }
-            //}
-            //catch (IOException e)
-            //{
-            //    Console.WriteLine("S1 input exeption");
-            //    Console.WriteLine(e.Message);
-            //}
-
-
         }
+
+        private void InputBound2()
+        {
+			string path = "Bound2.txt";
+			try
+			{
+				using (StreamReader sr = new StreamReader(path))
+				{
+					int NumBound = int.Parse(sr.ReadLine());
+					int NumVertex1, NumVertex2, Side;
+					Bound2 = new List<S2>();
+					for (int i = 0; i < NumBound; i++)
+					{
+						var a = sr.ReadLine().Split();
+						NumVertex1 = int.Parse(a[0]);
+						NumVertex2 = int.Parse(a[1]);
+						Side = int.Parse(a[2]);
+						Bound2.Add(new S2(NumVertex1, NumVertex2, Side));
+					}
+				}
+			}
+			catch (IOException e)
+			{
+				Console.WriteLine("S1 input exeption");
+				Console.WriteLine(e.Message);
+			}
+		}
 
         private void InputPrams()
         {
