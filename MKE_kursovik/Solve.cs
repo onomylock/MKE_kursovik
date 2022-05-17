@@ -17,11 +17,11 @@ namespace MKE_kursovik
         GlobalVectorB rightB;
         int[] ia, ja;
         int N;
-        IO io;
+        //IO io;
 
         public Solve(IO io)
         {
-            this.io = io;
+            //this.io = io;
             Mesh mesh = new Mesh(io.Elements, io.RZ);
             (ia, ja) = mesh.BuildPotrait();
             M = new GlobalMatrixM(ia.Length, ja.Length);
@@ -42,7 +42,7 @@ namespace MKE_kursovik
             double[] Q_tmp = new double[ia.Length - 1];
             for (int i = 0; i < Q_tmp.Length; i++)
             {
-                Q_tmp[i] = function.AzTrue(io.RZ[i].R, io.RZ[i].Z, io.Time[0]);
+                Q_tmp[i] = function.AzTrue(io.RZ[i], io.Time[0]);
                 //Q_tmp[i] = function.fun(io.RZ[i].R, io.RZ[i].Z, io.Time[0]);
             }
             Q.Add(Q_tmp);
@@ -51,68 +51,103 @@ namespace MKE_kursovik
             //{
             //    A.di[s1.NumVertex] = 1.0e50;
             //}
-            
+
             for (int i = 1; i < io.Time.Count; i++)
             {
                 rightB = new GlobalVectorB();
                 A.GenGolbalMatrixA(G, M, M0, io.Time[i] - io.Time[i - 1]);
                 rightB.GenGlobalB(M, io.RZ, io.Elements, ia, ja, Q[i - 1], io.Time[i], io.Time[i] - io.Time[i - 1], io.Params);
-    //            Q_tmp = new double[N];
+                //            Q_tmp = new double[N];
 
-    //            for(int j = 0; j < N; j++)
-				//{
-    //                Q_tmp[j] += M.di[j] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
-    //                for(int k = ia[j]; k < ia[j + 1]; k++)
-				//	{
-    //                    int l = ja[k];
-    //                    Q_tmp[j] += M.ggl[k] * Q[i - 1][l] / (io.Time[i] - io.Time[i - 1]);
-    //                    Q_tmp[l] += M.ggu[k] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
-    //                }
-				//}
-				//for (int j = 0; j < N; j++)
-				//{
-				//	rightB.B[j] += Q_tmp[j];
-				//}
+                //            for(int j = 0; j < N; j++)
+                //{
+                //                Q_tmp[j] += M.di[j] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
+                //                for(int k = ia[j]; k < ia[j + 1]; k++)
+                //	{
+                //                    int l = ja[k];
+                //                    Q_tmp[j] += M.ggl[k] * Q[i - 1][l] / (io.Time[i] - io.Time[i - 1]);
+                //                    Q_tmp[l] += M.ggu[k] * Q[i - 1][j] / (io.Time[i] - io.Time[i - 1]);
+                //                }
+                //}
+                //for (int j = 0; j < N; j++)
+                //{
+                //	rightB.B[j] += Q_tmp[j];
+                //}
 
-				foreach (var s1 in io.Bound1)
-				{
-					A.di[s1.NumVertex] = 1.0e50;
-					rightB.B[s1.NumVertex] = 1.0e50 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
-				}
-				Q.Add(LOS());
+                foreach (var s2 in io.Bound2)
+                {
+                    double HZtmp = io.RZ[s2.NumVertex2].Z - io.RZ[s2.NumVertex1].Z;
+                    double[] S2Tmp = s2.GenVectorBS2(io.RZ[s2.NumVertex1], io.RZ[s2.NumVertex2], io.Time[i], HZtmp);
+                    rightB.B[s2.NumVertex1] += S2Tmp[0];
+                    rightB.B[s2.NumVertex2] += S2Tmp[1];
+                }
+
+                foreach (var s1 in io.Bound1)
+                {
+                    A.di[s1.NumVertex] = 1.0e11;
+                    rightB.B[s1.NumVertex] = 1.0e11 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
+                }
+                Q.Add(LOS());
             }
 
-            using ( StreamWriter writer = new StreamWriter("output.txt", false))
+            using (StreamWriter writer = new StreamWriter("output.txt", false))
             {
                 //string text = "Afi      Afi(true)      Afi(err)";
                 //writer.WriteLine(text);
 
-                for (int i = 0; i < io.Time.Count; i++)
+                //for (int i = 1; i < io.Time.Count; i++)
+                //{
+                //    //writer.WriteLine("Time = " + io.Time[i].ToString());
+                //    //double[] Az_true = new double[Q[i].Length];
+                //    //double sum = 0;
+                //    //for (int k = 0; k < io.Elements.Count; k++)
+                //    //{
+                //    //    for (int j = 0; j < 4; j++)
+                //    //    {
+                //    //        int l = io.Elements[k].VertexArr.ToArray()[j];
+                //    //        Az_true[l] = function.AzTrue(io.RZ[l], io.Time[i]);
+                //    //    }
+                //    //}
+
+                //    for (int j = 0; j < Q[i].Length; j++)
+                //    {
+                //        //double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
+                //        //sum += Math.Pow(sum_tmp, 2);
+                //        writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[i][j].ToString());
+                //    }
+                //    //sum = Math.Sqrt(sum);
+                //    //sum = Math.Sqrt(sum) / (double)Q[i].Length;
+                //    //writer.WriteLine("square error = " + sum.ToString());
+                //}
+                int start = io.NumR * (io.NumZDown - 1);
+                //for (int j = start + io.NumRDown; j < start + io.NumR; j++)
+                for (int j = start; j < start + io.NumR; j++)
+                //for (int j = 0; j < Q[1].Length; j++)
                 {
                     writer.WriteLine("Time = " + io.Time[i].ToString());
                     double[] Az_true = new double[Q[i].Length];
                     double sum = 0;
-                    for(int k = 0; k < io.Elements.Count; k++)
-					{
-                        for(int j = 0; j < 4; j++)
-						{
+                    for (int k = 0; k < io.Elements.Count; k++)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
                             int l = io.Elements[k].VertexArr.ToArray()[j];
                             Az_true[l] = function.AzTrue(io.RZ[l].R, io.RZ[l].Z, io.Time[i]);
                         }
-					}
+                    }
                     for (int j = 0; j < Q[i].Length; j++)
                     {
                         bool flag = false;
-                        foreach(var s1 in io.Bound1)
-						{
+                        foreach (var s1 in io.Bound1)
+                        {
                             if (s1.NumVertex == j)
-							{
+                            {
                                 flag = true;
                                 continue;
-							}
+                            }
                         }
                         if (flag) continue;
-                        
+
                         double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
                         sum += Math.Pow(sum_tmp, 2);
                         //writer.WriteLine(Q[i][j].ToString() + "\t\t\t\t\t" + Az_true[j].ToString() + "\t\t\t\t\t" + sum_tmp.ToString());
@@ -120,48 +155,89 @@ namespace MKE_kursovik
                     //sum = Math.Sqrt(sum);
                     sum = Math.Sqrt(sum) / (double)(Q[i].Length - io.Bound1.Count);
                     writer.WriteLine("square error = " + sum.ToString());
+                    //writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
+                    //writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
                 }
+
                 writer.Close();
             }
-		}
+
+            //using (StreamWriter writer = new StreamWriter("output.txt", false))
+            //{
+            //    //string text = "Afi      Afi(true)      Afi(err)";
+            //    //writer.WriteLine(text);
+
+            //    for (int i = 0; i < io.Time.Count; i++)
+            //    {
+            //        writer.WriteLine("Time = " + io.Time[i].ToString());
+            //        double[] Az_true = new double[Q[i].Length];
+            //        double sum = 0;
+            //        for (int k = 0; k < io.Elements.Count; k++)
+            //        {
+            //            for (int j = 0; j < 4; j++)
+            //            {
+            //                int l = io.Elements[k].VertexArr.ToArray()[j];
+            //                Az_true[l] = function.AzTrue(io.RZ[l], io.Time[i]);
+            //            }
+            //        }
+            //        for (int j = 0; j < Q[i].Length; j++)
+            //        {
+            //            double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
+            //            sum += Math.Pow(sum_tmp, 2);
+            //            //writer.WriteLine(Q[i][j].ToString() + "\t\t\t\t\t" + Az_true[j].ToString() + "\t\t\t\t\t" + sum_tmp.ToString());
+            //        }
+            //        //sum = Math.Sqrt(sum);
+            //        sum = Math.Sqrt(sum) / (double)Q[i].Length;
+            //        writer.WriteLine("square error = " + sum.ToString());
+            //    }
+            //    writer.Close();
+            //}
+        }
 
         private void LUsq(double[] ggl, double[] ggu, double[] di)
         {
-            for (int i = 0; i < N; i++)
+            try
             {
-                double sumdi = 0;
-                int i0 = ia[i];
-                int i1 = ia[i + 1];
-                for (int k = i0; k < i1; k++) // к показывает сколько элементов мы обработали в i строке 
+                for (int i = 0; i < N; i++)
                 {
-                    int j = ja[k];// номер столбца  к-го элемента i строки 
-                    double sumal = 0;
-                    double sumau = 0;
-
-                    int j0 = ia[j];
-                    int j1 = ia[j + 1];
-
-                    int ki = i0;
-                    int kj = j0;
-                    for (; ki < k && kj < j1;) // пока есть элементы которые предшествуют к-му элементу
+                    double sumdi = 0;
+                    int i0 = ia[i];
+                    int i1 = ia[i + 1];
+                    for (int k = i0; k < i1; k++) // к показывает сколько элементов мы обработали в i строке 
                     {
-                        int j_kl = ja[ki];
-                        int j_ku = ja[kj];
-                        if (j_kl == j_ku) // чтобы рассматриваемые элементы не были нулевыми 
-                        {
-                            sumal += ggu[kj] * ggl[ki];
-                            sumau += ggu[ki] * ggl[kj];
-                            ki++; kj++;
-                        }
-                        else if (j_kl < j_ku) ki++;
-                        else kj++;
-                    }
+                        int j = ja[k];// номер столбца  к-го элемента i строки 
+                        double sumal = 0;
+                        double sumau = 0;
 
-                    ggu[k] = (ggu[k] - sumau) / di[j];
-                    ggl[k] = (ggl[k] - sumal) / di[j];
-                    sumdi += ggl[k] * ggu[k];
+                        int j0 = ia[j];
+                        int j1 = ia[j + 1];
+
+                        int ki = i0;
+                        int kj = j0;
+                        for (; ki < k && kj < j1;) // пока есть элементы которые предшествуют к-му элементу
+                        {
+                            int j_kl = ja[ki];
+                            int j_ku = ja[kj];
+                            if (j_kl == j_ku) // чтобы рассматриваемые элементы не были нулевыми 
+                            {
+                                sumal += ggu[kj] * ggl[ki];
+                                sumau += ggu[ki] * ggl[kj];
+                                ki++; kj++;
+                            }
+                            else if (j_kl < j_ku) ki++;
+                            else kj++;
+                        }
+
+                        ggu[k] = (ggu[k] - sumau) / di[j];
+                        ggl[k] = (ggl[k] - sumal) / di[j];
+                        sumdi += ggl[k] * ggu[k];
+                    }
+                    di[i] = Math.Sqrt(di[i] - sumdi);
                 }
-                di[i] = Math.Sqrt(di[i] - sumdi);
+            }
+            catch
+            {
+                Console.WriteLine("NaN Value Exeption!");
             }
         }
 
@@ -232,7 +308,7 @@ namespace MKE_kursovik
 
         private double[] LOS()
         {
-            double eps = 1e-60, norm, alfa = 0, beta = 0;
+            double eps = 1e-10, norm, alfa = 0, beta = 0;
             int k = 0, max_iter = 1000;
 
             double[] mult1, mult2, R, Z, P, ggl, ggu, di, Q_tmp;
@@ -291,7 +367,7 @@ namespace MKE_kursovik
                     Z[i] = beta * Z[i] + mult2[i];
                     P[i] = mult1[i] + beta * P[i];
                 }
-                norm = Math.Sqrt(ScalarProduct(R, R));
+                norm = Math.Sqrt(ScalarProduct(R, R)) / N;
 
                 //Console.WriteLine("Iteration: " + (k + 1).ToString() + "\tError: " + norm.ToString());
             }
