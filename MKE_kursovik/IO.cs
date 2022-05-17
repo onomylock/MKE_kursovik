@@ -273,29 +273,40 @@ namespace MKE_kursovik
 
         private void InputBound2()
         {
-            string path = "Bound2.txt";
-            try
+            Bound2 = new List<S2>();
+
+            int num = NumR * NumZ;
+
+            for (int i = NumR; i < num; i += NumR)
             {
-                using (StreamReader sr = new StreamReader(path))
-                {
-                    int NumBound = int.Parse(sr.ReadLine());
-                    int NumVertex1, NumVertex2, Side;
-                    Bound2 = new List<S2>();
-                    for (int i = 0; i < NumBound; i++)
-                    {
-                        var a = sr.ReadLine().Split();
-                        NumVertex1 = int.Parse(a[0]);
-                        NumVertex2 = int.Parse(a[1]);
-                        Side = int.Parse(a[2]);
-                        Bound2.Add(new S2(NumVertex1, NumVertex2, Side));
-                    }
-                }
+                Bound2.Add(new S2(i - NumR , i, 0));
             }
-            catch (IOException e)
-            {
-                Console.WriteLine("S1 input exeption");
-                Console.WriteLine(e.Message);
-            }
+
+            //string path = "Bound2.txt";
+            //try
+            //{
+            //    using (StreamReader sr = new StreamReader(path))
+            //    {
+            //        int NumBound = int.Parse(sr.ReadLine());
+            //        int NumVertex1, NumVertex2, Side;
+            //        Bound2 = new List<S2>();
+            //        for (int i = 0; i < NumBound; i++)
+            //        {
+            //            var a = sr.ReadLine().Split();
+            //            NumVertex1 = int.Parse(a[0]);
+            //            NumVertex2 = int.Parse(a[1]);
+            //            Side = int.Parse(a[2]);
+            //            Bound2.Add(new S2(NumVertex1, NumVertex2, Side));
+            //        }
+            //    }
+            //}
+            //catch (IOException e)
+            //{
+            //    Console.WriteLine("S1 input exeption");
+            //    Console.WriteLine(e.Message);
+            //}
+
+
         }
 
         private void InputPrams()

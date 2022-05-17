@@ -84,8 +84,8 @@ namespace MKE_kursovik
 
                 foreach (var s1 in io.Bound1)
                 {
-                    A.di[s1.NumVertex] = 1.0e7;
-                    rightB.B[s1.NumVertex] = 1.0e7 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
+                    A.di[s1.NumVertex] = 1.0e11;
+                    rightB.B[s1.NumVertex] = 1.0e11 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
                 }
                 Q.Add(LOS());
             }

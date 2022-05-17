@@ -62,7 +62,7 @@ namespace MKE_kursovik
         public Parameter(double sigma, double mu)
         {
             Sigma = sigma;
-            Mu = mu / (4 * Math.PI * 10e-7);
+            Mu = 1.0 / (mu * 4 * Math.PI * 10e-7);
         }
     }
 
@@ -255,15 +255,15 @@ namespace MKE_kursovik
         public double[,] GenLocal(double rp, Parameter param, double Hz, double Hr)
         {
             double[,] LocalG = new double[4, 4];
-            double a1 = (Hz * rp) / (param.Mu * 6 * Hr),
-                    a2 = Hz / (param.Mu * 12),
-                    a3 = (Hr * rp) / (param.Mu * 6 * Hz),
-                    a4 = (Hr * Hr) / (param.Mu * 12 * Hz);
-            //double a1 = (param.Mu * Hz) / (6 * Hr),
-            //        a2 = (param.Mu * Hz) / (12),
-            //        a3 = (param.Mu * Hr) / (6 * Hz),
-            //        a4 = (param.Mu * Hr) / (12 * Hz);
-            LocalG[0, 0] = 2 * a1 + 2 * a2 + 2 * a3 + 1 * a4;
+			//double a1 = (Hz * rp) / ( 6 * Hr),
+			//        a2 = Hz / (param.Mu * 12),
+			//        a3 = (Hr * rp) / (param.Mu * 6 * Hz),
+			//        a4 = (Hr * Hr) / (param.Mu * 12 * Hz);
+			double a1 = (param.Mu * Hz * rp) / (6 * Hr),
+					a2 = (param.Mu * Hz) / (12),
+					a3 = (param.Mu * Hr * rp) / (6 * Hz),
+					a4 = (param.Mu * Hr) / (12 * Hz);
+			LocalG[0, 0] = 2 * a1 + 2 * a2 + 2 * a3 + 1 * a4;
             LocalG[0, 1] = -2 * a1 - 2 * a2 + 1 * a3 + 1 * a4;
             LocalG[0, 2] = 1 * a1 + 1 * a2 - 2 * a3 - 1 * a4;
             LocalG[0, 3] = -1 * a1 - 1 * a2 - 1 * a3 - 1 * a4;
