@@ -86,9 +86,9 @@ namespace MKE_kursovik
 				//}
 
 				int start = io.NumR * (io.NumZDown - 1);
-				//for (int j = start + io.NumRDown; j < start + io.NumR; j++)
-				for (int j = start; j < start + io.NumR; j++)
-				//for (int j = 0; j < Q[1].Length; j++)
+				for (int j = start + io.NumRDown; j < start + io.NumR; j++)
+				//for (int j = start; j < start + io.NumR; j++)
+			    //for (int j = 0; j < Q[1].Length; j++)
 				{
 					writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[5][j].ToString());
 					//writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());

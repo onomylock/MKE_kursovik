@@ -85,7 +85,7 @@ namespace MKE_kursovik
 
 			switch (rz.NumOfFun)
 			{
-				case 1: return 1 / (rz.R * rz.R);
+				case 1: return param.Mu / (rz.R * rz.R * 100);
 				//case 1: return 1;
 				case 2: return 0;
 				default: return 0;
