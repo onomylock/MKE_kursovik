@@ -20,16 +20,12 @@ namespace MKE_kursovik
             //    case 3: return 5 * r * r; //right
             //    default: return 0;
             //}
-            //return Bound.Z;
-            //return Bound.R * Bound.R + Bound.Z + t;
-            //return Bound.R * Bound.R * Bound.R;
-            //return Bound.R * Bound.R;
-            //return Bound.R;
-            //return Bound.R * Bound.R * Bound.R * Bound.R;
-            //return Bound.R + t * t;
-            //return Math.Cos(Bound.R * Bound.R + 3 * Bound.Z) - Math.Sin(t);
-            //return t * t;
-            return 0;
+            //return 5; //1 test
+            //return Bound.R; //2 test
+            //return Bound.R * Bound.R; // test 3
+            //return Bound.R * Bound.R * Bound.R; //4 test
+            //return t; //5 test        
+            return t * t; //6 test
         }
 
         public S1(int NumVertex, int Side)

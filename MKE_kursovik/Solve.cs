@@ -15,13 +15,14 @@ namespace MKE_kursovik
         GlobalMatrixA A;
         GlobalMatrixM0 M0;
         GlobalVectorB rightB;
+        IO io;
         int[] ia, ja;
         int N;
-        //IO io;
+		//IO io;
 
         public Solve(IO io)
-        {
-            //this.io = io;
+		{
+            this.io = io;
             Mesh mesh = new Mesh(io.Elements, io.RZ);
             (ia, ja) = mesh.BuildPotrait();
             M = new GlobalMatrixM(ia.Length, ja.Length);
@@ -37,20 +38,12 @@ namespace MKE_kursovik
             Function function = new Function();
 
             Q = new List<double[]>();
-            //A.GenGolbalMatrixA(G, M, io.Time[1] - io.Time[0]);
-            //ResultVectors Q = new ResultVectors();
             double[] Q_tmp = new double[ia.Length - 1];
             for (int i = 0; i < Q_tmp.Length; i++)
             {
                 Q_tmp[i] = function.AzTrue(io.RZ[i], io.Time[0]);
-                //Q_tmp[i] = function.fun(io.RZ[i].R, io.RZ[i].Z, io.Time[0]);
             }
             Q.Add(Q_tmp);
-
-            //foreach (var s1 in io.Bound1)
-            //{
-            //    A.di[s1.NumVertex] = 1.0e50;
-            //}
 
             for (int i = 1; i < io.Time.Count; i++)
             {
@@ -68,17 +61,156 @@ namespace MKE_kursovik
 
                 foreach (var s1 in io.Bound1)
                 {
-                    A.di[s1.NumVertex] = 1.0e12;
-                    rightB.B[s1.NumVertex] = 1.0e12 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
+                    A.di[s1.NumVertex] = 1.0e20;
+                    rightB.B[s1.NumVertex] = 1.0e20 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
                 }
                 Q.Add(LOS());
             }
 
-            using (StreamWriter writer = new StreamWriter("output.txt", false))
+            using (StreamWriter writer = new StreamWriter("out_diss.txt", false))
             {
+                for (int i = 0; i < io.Time.Count; i++)
+                {
+                    writer.WriteLine("Time = " + io.Time[i].ToString());
+                    double[] Az_true = new double[Q[i].Length];
+                    double sum = 0;
+                    for (int k = 0; k < io.Elements.Count; k++)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
+                            int l = io.Elements[k].VertexArr.ToArray()[j];
+                            Az_true[l] = function.AzTrue(io.RZ[l], io.Time[i]);
+                        }
+                    }
+                    for (int j = 0; j < Q[i].Length; j++)
+                    {
+                        bool flag = false;
+                        foreach (var s1 in io.Bound1)
+                        {
+                            if (s1.NumVertex == j)
+                            {
+                                flag = true;
+                                continue;
+                            }
+                        }
+                        if (flag) continue;
+
+                        double sum_tmp = Math.Abs(Q[i][j] - Az_true[j]);
+                        sum += Math.Pow(sum_tmp, 2);
+                        //writer.WriteLine(Q[i][j].ToString() + "\t\t\t\t\t" + Az_true[j].ToString() + "\t\t\t\t\t" + sum_tmp.ToString());
+                    }
+                    //sum = Math.Sqrt(sum);
+                    sum = Math.Sqrt(sum) / (double)(Q[i].Length - io.Bound1.Count);
+                    writer.WriteLine("square error = " + sum.ToString());
+
+                }
+                writer.Close();
+            }
+
+			//using (StreamWriter writer = new StreamWriter("output.txt", false))
+   //         {
+   //             int start = io.NumR * (io.NumZDown - 1);
+   //             for (int j = start + io.NumRDown - 1; j < start + io.NumR; j++)
+   //             //for (int j = start; j < start + io.NumR; j++)
+   //             //for (int j = 0; j < Q[1].Length; j++)
+   //             {
+   //                 writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[1][j].ToString());
+   //                 //writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
+   //             }
+
+   //             writer.Close();
+   //         }
+        }
+
+		public Solve(IO io, int GrigSetting)
+		{
+            string path = "BS.txt", path_out = "", path_out_d = "", path_out_p = "";
+
+            switch (GrigSetting)
+            {
+                case 1:
+                    {
+                        path_out = "output1.txt";
+                        path_out_d = "output_d1.txt";
+                        path_out_p = "output_p1.txt";
+                    }
+                    break;
+                case 2:
+                    {
+                        path_out = "output2.txt";
+                        path_out_d = "output_d2.txt";
+                        path_out_p = "output_p2.txt";
+                    }
+                    break;
+                case 3:
+					{
+                        path_out = "output4.txt";
+                        path_out_d = "output_d4.txt";
+                        path_out_p = "output_p4.txt";
+                    }
+                    break;
+                case 4:
+					{
+                        path_out = "output8.txt";
+                        path_out_d = "output_d8.txt";
+                        path_out_p = "output_p8.txt";
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+
+            this.io = io;
+			Mesh mesh = new Mesh(io.Elements, io.RZ);
+			(ia, ja) = mesh.BuildPotrait();
+			M = new GlobalMatrixM(ia.Length, ja.Length);
+			G = new GlobalMatrixG(ia.Length, ja.Length);
+			M0 = new GlobalMatrixM0(ia.Length, ja.Length);
+			A = new GlobalMatrixA(ia.Length, ja.Length);
+			GenGlobalMatrix gen = new GenGlobalMatrix();
+			gen.AddToGlobal(G, io.RZ, io.Elements, io.Params, ia, ja);
+			gen.AddToGlobal(M, io.RZ, io.Elements, io.Params, ia, ja);
+			gen.AddToGlobal(M0, io.RZ, io.Elements, io.Params, ia, ja);
+			A.GenGolbalMatrixA(G, M, M0, io.Time[1] - io.Time[0]);
+			N = io.RZ.Count();
+			Function function = new Function();
+
+			Q = new List<double[]>();
+			double[] Q_tmp = new double[ia.Length - 1];
+			for (int i = 0; i < Q_tmp.Length; i++)
+			{
+				Q_tmp[i] = function.AzTrue(io.RZ[i], io.Time[0]);
+			}
+			Q.Add(Q_tmp);
+
+			for (int i = 1; i < io.Time.Count; i++)
+			{
+				rightB = new GlobalVectorB();
+				A.GenGolbalMatrixA(G, M, M0, io.Time[i] - io.Time[i - 1]);
+				rightB.GenGlobalB(M, io.RZ, io.Elements, ia, ja, Q[i - 1], io.Time[i], io.Time[i] - io.Time[i - 1], io.Params);
+
+				foreach (var s2 in io.Bound2)
+				{
+					double HZtmp = io.RZ[s2.NumVertex2].Z - io.RZ[s2.NumVertex1].Z;
+					double[] S2Tmp = s2.GenVectorBS2(io.RZ[s2.NumVertex1], io.RZ[s2.NumVertex2], io.Time[i], HZtmp);
+					rightB.B[s2.NumVertex1] += S2Tmp[0];
+					rightB.B[s2.NumVertex2] += S2Tmp[1];
+				}
+
+				foreach (var s1 in io.Bound1)
+				{
+					A.di[s1.NumVertex] = 1.0e20;
+					rightB.B[s1.NumVertex] = 1.0e20 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
+				}
+				Q.Add(LOS());
+			}
+
+			using (StreamWriter writer = new StreamWriter(path_out, false))
+			{
 				//for (int i = 1; i < io.Time.Count; i++)
 				//{
-					
+
 				//	for (int j = 0; j < Q[i].Length; j++)
 				//	{
 				//		writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[i][j].ToString());
@@ -86,16 +218,148 @@ namespace MKE_kursovik
 				//}
 
 				int start = io.NumR * (io.NumZDown - 1);
-				for (int j = start + io.NumRDown; j < start + io.NumR; j++)
+				for (int j = start + io.NumRDown - 1; j < start + io.NumR; j++)
 				//for (int j = start; j < start + io.NumR; j++)
-			    //for (int j = 0; j < Q[1].Length; j++)
+				//for (int j = 0; j < Q[1].Length; j++)
 				{
-					writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[5][j].ToString());
+					writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[1][j].ToString());
 					//writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
 				}
 
+				writer.Close();
+			}
+
+            
+            List<Tuple<double, double>> R_BS = new List<Tuple<double, double>>();
+			try
+			{
+                using (StreamReader sr = new StreamReader(path))
+                {
+                    sr.ReadLine();
+                    sr.ReadLine();
+                    
+                    while (sr.Peek() > -1)
+					{
+                        var tmp = sr.ReadLine().Split();
+                        Tuple<double, double> tuple = Tuple.Create(double.Parse(tmp[0]), double.Parse(tmp[1]));
+
+                        R_BS.Add(tuple);
+					}
+                    sr.Close();
+                }
+            }
+            catch (IOException e)
+			{
+                Console.WriteLine(e.Message);
+			}
+            
+            using (StreamWriter writer = new StreamWriter(path_out_d, false))
+			{
+                double Q_point = 0;
+                Vertex P_tmp;
+                Tuple<double, double> tuple_tmp = Tuple.Create(0.0, 0.0);
+                for (int i = 0; i < R_BS.Count; i++)
+				{
+                    P_tmp = new Vertex(R_BS[i].Item1, io.PointSource.Z);
+                    Q_point = APoint(P_tmp, 1);
+                    writer.WriteLine(R_BS[i].Item1.ToString()+ "\t\t\t" + (Math.Abs((Q_point - R_BS[i].Item2) / R_BS[i].Item2)).ToString());
+				}
+
+                writer.Close();
+			}
+
+            using (StreamWriter writer = new StreamWriter(path_out_p, false))
+            {
+                double Q_point = 0;
+                Vertex P_tmp;
+                Tuple<double, double> tuple_tmp = Tuple.Create(0.0, 0.0);
+                for (int i = 0; i < R_BS.Count; i++)
+                {
+                    P_tmp = new Vertex(R_BS[i].Item1, io.PointSource.Z);
+                    Q_point = APoint(P_tmp, 1);
+                    writer.WriteLine(R_BS[i].Item1.ToString() + "\t\t\t" + Q_point.ToString());
+                }
+
                 writer.Close();
             }
+
+            using (StreamWriter writer = new StreamWriter("output.txt", false))
+            {
+                //for (int i = 1; i < io.Time.Count; i++)
+                //{
+
+                //	for (int j = 0; j < Q[i].Length; j++)
+                //	{
+                //		writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[i][j].ToString());
+                //	}
+                //}
+
+                //for (int i = 0; i < Q.Count; i++)
+                //{
+                //    for (int j = 0; j < Q[i].Length; j++)
+                //    {
+
+                //    }
+                //}
+
+                int start = io.NumR * (io.NumZDown - 1);
+                //for (int j = start + io.NumRDown - 1; j < start + io.NumR; j++)
+                //for (int j = start; j < start + io.NumR; j++)
+                for (int j = 0; j < Q[1].Length; j++)
+                {
+                    //writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[1][j].ToString());
+                    writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
+                }
+
+                writer.Close();
+            }
+        }
+
+        private int[] findKE(Vertex Point)
+        {
+            if (io.Elements == null) return null;
+            foreach (var elem in io.Elements)
+            {
+                int[] elemArr = elem.VertexArr.ToArray();
+                if (io.RZ[elemArr[0]].R <= Point.R && Point.R <= io.RZ[elemArr[1]].R)
+                    if (io.RZ[elemArr[0]].Z <= Point.Z && Point.Z <= io.RZ[elemArr[3]].Z)
+                        return elemArr;
+            }
+
+            return null;
+        }
+
+        private double APoint(Vertex Point, int layerNum)
+        {
+            int[] s = findKE(Point);
+
+            if (s == null)
+            {
+                Console.WriteLine("Error: Wrong point");
+                return -1;
+            }
+
+            double f1, f2, f3, f4;
+            double q1, q2, q3, q4;
+            double x1, x2, y1, y2;
+
+            x1 = (io.RZ[s[1]].R - Point.R) / (io.RZ[s[1]].R - io.RZ[s[0]].R);
+            y1 = (io.RZ[s[3]].Z - Point.Z) / (io.RZ[s[3]].Z - io.RZ[s[0]].Z);
+            x2 = (Point.R - io.RZ[s[0]].R) / (io.RZ[s[1]].R - io.RZ[s[0]].R);
+            y2 = (Point.Z - io.RZ[s[0]].Z) / (io.RZ[s[3]].Z - io.RZ[s[0]].Z);
+
+            f1 = x1 * y1;
+            f2 = x2 * y1;
+            f3 = x1 * y2;
+            f4 = x2 * y2;
+
+            q1 = Q[layerNum][s[0]];
+            q2 = Q[layerNum][s[1]];
+            q3 = Q[layerNum][s[2]];
+            q4 = Q[layerNum][s[3]];
+
+            double v = q1 * f1 + q2 * f2 + q3 * f3 + q4 * f4;
+            return v;
         }
 
         private void LUsq(double[] ggl, double[] ggu, double[] di)

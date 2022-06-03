@@ -53,23 +53,43 @@ namespace MKE_kursovik
 
         public Vertex PointSource { get; set; }
 
-        public IO(bool PointSourseBool)
-        {
-            if (PointSourseBool)
-            {
-                InputGridPointSource();
-                GetGridPointSource();
-                InputBound1PointSource();
-                InputBound2PointSource();
-            }
-            else
-            {
-                InputGrid();
-                GetGrid();
-                InputBound1();
-                InputBound2();
-            }
+        public IO()
+        { 
+            InputGrid();
+            GetGrid();
+            InputBound1();
+            InputBound2();
+            InputTime();
+            GetTime();
+            InputNumofPram();
+            GetElements();
+            InputPrams();
+        }
 
+        public IO(int GrigSetting)
+        {
+            string path = "";
+            switch (GrigSetting)
+            {
+                case 1:
+                    path = "GridPoint1.txt";
+                    break;
+                case 2:
+                    path = "GridPoint2.txt";
+                    break;
+                case 3:
+                    path = "GridPoint4.txt";
+                    break;
+                case 4:
+                    path = "GridPoint8.txt";
+                    break;
+                default:
+                    break;
+            }
+			InputGridPointSource(path);
+            GetGridPointSource();
+            InputBound1PointSource();
+            InputBound2PointSource();
             InputTime();
             GetTime();
             InputNumofPram();
@@ -81,7 +101,7 @@ namespace MKE_kursovik
         {
             Time = new List<double>();
             double TimeTmp = TimeStart;
-            int TimeIter = ((int)((int)(TimeEnd - TimeStart) / TimeH));
+            int TimeIter = ((int)((TimeEnd - TimeStart) / TimeH));
 
             for (int i = 0; i <= TimeIter; i++, TimeTmp += TimeH)
             {
@@ -388,9 +408,8 @@ namespace MKE_kursovik
             }
         }
 
-        private void InputGridPointSource()
+        private void InputGridPointSource(string path)
         {
-            string path = "GridPoint.txt";
             try
             {
                 using (StreamReader sr = new StreamReader(path))
@@ -402,8 +421,8 @@ namespace MKE_kursovik
 
                     tmp = sr.ReadLine().Split();
                     NumRDown = int.Parse(tmp[0]);
-                    NumZDown = int.Parse(tmp[1]);
-                    NumRUp = int.Parse(tmp[2]);
+                    NumRUp = int.Parse(tmp[1]);
+                    NumZDown = int.Parse(tmp[2]);
                     NumZUp = int.Parse(tmp[3]);
                     NumR = NumRDown + NumRUp - 1;
                     NumZ = NumZDown + NumZUp - 1;
