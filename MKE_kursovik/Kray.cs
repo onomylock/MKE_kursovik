@@ -25,7 +25,8 @@ namespace MKE_kursovik
             //return Bound.R * Bound.R; // test 3
             //return Bound.R * Bound.R * Bound.R; //4 test
             //return t; //5 test        
-            return t * t; //6 test
+            //return t * t; //6 test
+            return 0;
         }
 
         public S1(int NumVertex, int Side)

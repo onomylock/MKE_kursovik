@@ -130,30 +130,30 @@ namespace MKE_kursovik
             {
                 case 1:
                     {
-                        path_out = "output1.txt";
-                        path_out_d = "output_d1.txt";
-                        path_out_p = "output_p1.txt";
+                        path_out = "Point/output1.txt";
+                        path_out_d = "Point/output_d1.txt";
+                        path_out_p = "Point/output_p1.txt";
                     }
                     break;
                 case 2:
                     {
-                        path_out = "output2.txt";
-                        path_out_d = "output_d2.txt";
-                        path_out_p = "output_p2.txt";
+                        path_out = "Point/output2.txt";
+                        path_out_d = "Point/output_d2.txt";
+                        path_out_p = "Point/output_p2.txt";
                     }
                     break;
                 case 3:
 					{
-                        path_out = "output4.txt";
-                        path_out_d = "output_d4.txt";
-                        path_out_p = "output_p4.txt";
+                        path_out = "Point/output4.txt";
+                        path_out_d = "Point/output_d4.txt";
+                        path_out_p = "Point/output_p4.txt";
                     }
                     break;
                 case 4:
 					{
-                        path_out = "output8.txt";
-                        path_out_d = "output_d8.txt";
-                        path_out_p = "output_p8.txt";
+                        path_out = "Point/output8.txt";
+                        path_out_d = "Point/output_d8.txt";
+                        path_out_p = "Point/output_p8.txt";
                     }
                     break;
                 default:
@@ -308,7 +308,7 @@ namespace MKE_kursovik
                 for (int j = 0; j < Q[1].Length; j++)
                 {
                     //writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + Q[1][j].ToString());
-                    writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[2][j].ToString());
+                    writer.WriteLine(io.RZ[j].R.ToString() + "\t\t\t\t\t" + io.RZ[j].Z.ToString() + "\t\t\t\t\t" + Q[1][j].ToString());
                 }
 
                 writer.Close();
@@ -535,7 +535,7 @@ namespace MKE_kursovik
                     Z[i] = beta * Z[i] + mult2[i];
                     P[i] = mult1[i] + beta * P[i];
                 }
-                norm = Math.Sqrt(ScalarProduct(R, R)) / N;
+                norm = Math.Sqrt(ScalarProduct(R, R));
 
                 //Console.WriteLine("Iteration: " + (k + 1).ToString() + "\tError: " + norm.ToString());
             }

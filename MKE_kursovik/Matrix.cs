@@ -62,8 +62,8 @@ namespace MKE_kursovik
         public Parameter(double sigma, double mu)
         {
             Sigma = sigma;
-            //Mu = 1.0 / (mu * 4 * Math.PI * 10e-7);
-            Mu = mu;
+            Mu = 1.0 / (mu * 4 * Math.PI * 10e-7);
+            //Mu = mu;
         }
     }
 
@@ -71,39 +71,39 @@ namespace MKE_kursovik
     {
         public double fun(Vertex rz, double t, Parameter param)
         {
-            //return 5 / (rz.R * rz.R);   //1 test
-            //return 0; //2 test
-            //return -3; //3 test
-            //return -8 * rz.R; //4 test
-            //return 1; //5 test
-            return 2 * t + t * t / (rz.R * rz.R); //6 test
+			//return 5 / (rz.R * rz.R);   //1 test
+			//return 0; //2 test
+			//return -3; //3 test
+			//return -8 * rz.R; //4 test
+			//return 1; //5 test
+			//return 2 * t + t * t / (rz.R * rz.R); //6 test
 
-			//switch (rz.NumOfFun)
-			//{
-			//	case 1: return param.Mu / (rz.R * rz.R);
-			//	//case 1: return param.Mu;
-			//	case 2: return 0;
-			//	default: return 0;
-			//}
+			switch (rz.NumOfFun)
+			{
+				case 1: return param.Mu / (rz.R * rz.R);
+				//case 1: return param.Mu;
+				case 2: return 0;
+				default: return 0;
+			}
 		}
 
 		public double AzTrue(Vertex rz, double t)
         {
-            //return 5;   //1 test
-            //return rz.R; //2 test
-            //return rz.R * rz.R; //3 test
-            //return rz.R * rz.R * rz.R; //4 test
-            //return t; //5 test
-            return t * t; //6 test
+			//return 5;   //1 test
+			//return rz.R; //2 test
+			//return rz.R * rz.R; //3 test
+			//return rz.R * rz.R * rz.R; //4 test
+			//return t; //5 test
+			//return t * t; //6 test
 
-            //switch (rz.NumOfFun)
-            //{
-            //             case 1: return 1;
-            //             //case 1: return rz.R * rz.R + 4 * t;
-            //             case 2: return 0;
-            //	default: return 0;
-            //}
-        }
+			switch (rz.NumOfFun)
+			{
+				case 1: return 1;
+				//case 1: return rz.R * rz.R + 4 * t;
+				case 2: return 0;
+				default: return 0;
+			}
+		}
     }
 
     public class GlobalVectorB

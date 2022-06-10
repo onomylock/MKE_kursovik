@@ -72,16 +72,16 @@ namespace MKE_kursovik
             switch (GrigSetting)
             {
                 case 1:
-                    path = "GridPoint1.txt";
+                    path = "Point/GridPoint1.txt";
                     break;
                 case 2:
-                    path = "GridPoint2.txt";
+                    path = "Point/GridPoint2.txt";
                     break;
                 case 3:
-                    path = "GridPoint4.txt";
+                    path = "Point/GridPoint4.txt";
                     break;
                 case 4:
-                    path = "GridPoint8.txt";
+                    path = "Point/GridPoint8.txt";
                     break;
                 default:
                     break;

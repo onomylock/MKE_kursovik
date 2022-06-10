@@ -15,21 +15,21 @@ namespace MKE_kursovik
         {
             Program program = new Program();
 
-			program.io = new IO();
-			program.solve = new Solve(program.io);
+			//program.io = new IO();
+			//program.solve = new Solve(program.io);
 
-			//program.io = new IO(4);
-			//program.solve = new(program.io, 4);
+			program.io = new IO(1);
+			program.solve = new(program.io, 1);
 
-			//program.io = new IO(2);
-			//program.solve = new(program.io, 2);
+			program.io = new IO(2);
+			program.solve = new(program.io, 2);
 
-			//program.io = new IO(3);
-			//program.solve = new(program.io, 3);
+			program.io = new IO(3);
+			program.solve = new(program.io, 3);
 
-			//program.io = new IO(4);
-			//program.solve = new(program.io, 4);
-			
+			program.io = new IO(4);
+			program.solve = new(program.io, 4);
+
 		}
     }
 }
