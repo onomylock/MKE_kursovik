@@ -283,7 +283,7 @@ namespace MKE_kursovik
                 writer.Close();
             }
 
-            using (StreamWriter writer = new StreamWriter("output.txt", false))
+            using (StreamWriter writer = new StreamWriter("outputGrid" + GrigSetting.ToString() + ".txt", false))
             {
                 //for (int i = 1; i < io.Time.Count; i++)
                 //{
@@ -302,7 +302,7 @@ namespace MKE_kursovik
                 //    }
                 //}
 
-                int start = io.NumR * (io.NumZDown - 1);
+                //int start = io.NumR * (io.NumZDown - 1);
                 //for (int j = start + io.NumRDown - 1; j < start + io.NumR; j++)
                 //for (int j = start; j < start + io.NumR; j++)
                 for (int j = 0; j < Q[1].Length; j++)
