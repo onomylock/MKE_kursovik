@@ -37,11 +37,15 @@ namespace MKE_kursovik
         private double TimeH;
         private double HrDown;
         private double HrUp;
+        private double HrUpEnd;
         private double HzDown;
         private double HzUp;
+        private double HzUpEnd;
         private double Hr;
         private double Hz;
         private int[] NumOfParameters;
+        private List<double> R_geom;
+        private List<double> Z_geom;
 
         public List<S1> Bound1 { get; set; }
 
@@ -59,6 +63,54 @@ namespace MKE_kursovik
             GetGrid();
             InputBound1();
             InputBound2();
+            InputTime();
+            GetTime();
+            InputNumofPram();
+            GetElements();
+            InputPrams();
+        }
+        
+        public IO(IO io_LastGrid)
+		{
+            //HrDown = io_LastGrid.HrDown / 2;
+            //HrUp = io_LastGrid.HrUp / 2;
+            //HrUpEnd = io_LastGrid.HrUpEnd / 2;
+            //HzDown = io_LastGrid.HzDown / 2;
+            //HzUp = io_LastGrid.HzUp / 2;
+            //HzUpEnd = io_LastGrid.HzUpEnd / 2;
+
+            Hr = io_LastGrid.Hr / 2;
+            Hz = io_LastGrid.Hz / 2;
+
+            R0 = io_LastGrid.R0;
+            R1 = io_LastGrid.R1;
+            Z0 = io_LastGrid.Z0;
+            Z1 = io_LastGrid.Z1;
+
+            PointSource = io_LastGrid.PointSource;
+
+            DiscRDown = Math.Sqrt(io_LastGrid.DiscRDown);
+            DiscRUp = Math.Sqrt(io_LastGrid.DiscRUp);
+            DiscZDown = Math.Sqrt(io_LastGrid.DiscZDown);
+            DiscZUp = Math.Sqrt(io_LastGrid.DiscZUp);
+
+            //DiscRDown = (HrDown - PointSource.R) / (HrUp - PointSource.R);
+            //DiscRUp = (HrUp - R1 + PointSource.R) / (HrUpEnd - R1 + PointSource.R);
+            //DiscZDown = (HzDown - Math.Abs(Z0 - PointSource.R)) / (HzUp - Math.Abs(Z0 - PointSource.R));
+            //DiscZUp = (HzUp - Math.Abs(Z1 - PointSource.R)) / (HzUpEnd - Math.Abs(Z1 - PointSource.R));
+
+            NumRDown = io_LastGrid.NumRDown * 2;
+            NumRUp = io_LastGrid.NumRUp * 2;
+            NumZDown = io_LastGrid.NumZDown * 2;
+            NumZUp = io_LastGrid.NumZUp * 2;
+
+            NumR = NumRDown + NumRUp;
+            NumZ = NumZDown + NumZUp;
+
+            Geom();
+            GetGridPointSource();
+            InputBound1PointSource();
+            InputBound2PointSource();
             InputTime();
             GetTime();
             InputNumofPram();
@@ -87,6 +139,7 @@ namespace MKE_kursovik
                     break;
             }
 			InputGridPointSource(path);
+            Geom();
             GetGridPointSource();
             InputBound1PointSource();
             InputBound2PointSource();
@@ -144,107 +197,209 @@ namespace MKE_kursovik
             }
         }
 
-        private void GetGridPointSource()
+		//      private void GetGridPointSource(IO io_LastGrid)
+		//{
+		//          RZ = new List<Vertex>();
+
+		//}
+
+		private void Geom()
+		{
+            List<double> Downtmp = new List<double>();
+            R_geom = new List<double>();
+            Z_geom = new List<double>();
+            double HTmp = Hr, tmp = PointSource.R;
+            
+
+            Downtmp.Add(PointSource.R);
+            for (int i = 0; i < NumRDown - 2; i++)
+			{
+                if (tmp - HTmp < R0) continue;
+                tmp -= HTmp;
+                Downtmp.Add(tmp);
+                HTmp *= DiscRDown;
+			}
+
+            Downtmp.Add(R0);
+
+            for (int i = Downtmp.Count - 1; i >= 0; i--)
+			{
+                R_geom.Add(Downtmp[i]);
+			}
+
+            NumRDown = Downtmp.Count;
+
+            HTmp = Hr;
+            tmp = PointSource.R;
+
+            for (int i = 0; i < NumRUp - 1; i++)
+            {
+                tmp += HTmp;
+                R_geom.Add(tmp);
+                HTmp *= DiscRUp;
+            }
+
+            R_geom.Add(R1);
+
+            HTmp = Hz;
+
+            Downtmp = new List<double>();
+            tmp = PointSource.Z;
+            for(int i = 0; i < NumZDown - 1; i++)
+			{
+                tmp -= HTmp;
+                Downtmp.Add(tmp);
+                HTmp *= DiscZDown;
+			}
+
+            Downtmp.Add(Z0);
+
+            for (int i = NumZDown - 1; i >= 0; i--)
+            {
+                Z_geom.Add(Downtmp[i]);
+            }
+
+            Z_geom.Add(PointSource.Z);
+
+            HTmp = Hz;
+            tmp = PointSource.Z;
+
+            for (int i = 0; i < NumZUp - 1; i++)
+            {
+                tmp += HTmp;
+                Z_geom.Add(tmp);
+                HTmp *= DiscZUp;
+            }
+
+            Z_geom.Add(Z1);
+
+        }
+
+		private void GetGridPointSource()
         {
-            double HrTmpDown = HrDown;
-            double HrTmpUp = HrUp;
-            double HzTmp = HzDown;
-            double Ri, Zi;
             RZ = new List<Vertex>();
-            RZ.Add(new Vertex(R0, Z0));
-            try
-            {
-                for (int i = 0; i < NumZDown; i++)
-                {
-                    if (i == 0) Zi = Z0;
-                    else if (i == NumZDown - 1) Zi = PointSource.Z;
-                    else Zi = RZ[RZ.Count - 1].Z + HzTmp;
-                    HrTmpUp = HrUp;
-                    HrTmpDown = HrDown;
-                    for (int j = 0; j < NumRDown; j++)
-                    {
-                        if (j == 0 && i == 0) continue;
-                        else if (j == 0)
-                        {
-                            RZ.Add(new Vertex(R0, Zi));
-                            continue;
-                        }
-                        else if (j == NumRDown - 1) Ri = PointSource.R;
-                        else Ri = RZ[RZ.Count - 1].R + HrTmpDown;
 
-                        RZ.Add(new Vertex(Ri, Zi));
-                        HrTmpDown *= DiscRDown;
+			foreach (double z in Z_geom)
+			{
+				foreach (double r in R_geom)
+				{
+                    if (r == PointSource.R && z == PointSource.Z)
+					{
+                        RZ.Add(new Vertex(r, z, 1));
                     }
+                    else
+                        RZ.Add(new Vertex(r, z));
+				}
+			}
 
-                    for (int j = 0; j < NumRUp; j++)
-                    {
-                        if (j == 0 && i == 0) continue;
-                        else if (j == 0)
-                        {
-                            //RZ.Add(new Vertex(PointSource.R, Zi));
-                            continue;
-                        }
-                        else if (j == NumRUp - 1) Ri = R1;
-                        else Ri = RZ[RZ.Count - 1].R + HrTmpUp;
+   //         for (int i = 0; i < Z_geom.Count; i++)
+			//{
+   //             for (int j = 0; j < R_geom.Count; j++)
+			//	{
 
-                        RZ.Add(new Vertex(Ri, Zi));
-                        HrTmpUp *= DiscRUp;
-                    }
-                    if (i == 0) continue;
-                    HzTmp *= DiscZDown;
-                }
+			//	}
+			//}                
 
-                HzTmp = HzUp;
-                for (int i = 0; i < NumZUp; i++)
-                {
-                    if (i == 0) continue;
-                    //if (i == 0) Zi = PointSource.Z;
-                    //if (i == 0)
-                    //{
-                    //    HzTmp /= DiscZ;
-                    //    continue;
-                    //}
-                    if (i == NumZUp - 1) Zi = Z1;
-                    else Zi = RZ[RZ.Count - 1].Z + HzTmp;
-                    HrTmpUp = HrUp;
-                    HrTmpDown = HrDown;
-                    for (int j = 0; j < NumRDown; j++)
-                    {
-                        //if (j == 0 && i == 0) continue;
-                        if (j == 0)
-                        {
-                            RZ.Add(new Vertex(R0, Zi));
-                            continue;
-                        }
-                        else if (j == NumRDown - 1) Ri = PointSource.R;
-                        else Ri = RZ[RZ.Count - 1].R + HrTmpDown;
+            //double HrTmpDown = HrDown;
+            //double HrTmpUp = HrUp;
+            //double HzTmp = HzDown;
+            //double Ri, Zi;
+            //RZ = new List<Vertex>();
+            //RZ.Add(new Vertex(R0, Z0));
+            //try
+            //{
+            //    for (int i = 0; i < NumZDown + 1 && RZ[RZ.Count - 1].Z < PointSource.Z; i++)
+            //    {
+            //        if (i == 0) Zi = Z0;                 
+            //        else if (i == NumZDown) Zi = PointSource.Z;
+            //        else Zi = RZ[RZ.Count - 1].Z + HzTmp;
+            //        HrTmpUp = HrUp;
+            //        HrTmpDown = HrDown;
+            //        for (int j = 0; j < NumRDown; j++)
+            //        {
+                        
+            //            if (j == 0 && i == 0) continue;
+            //            else if (j == 0)
+            //            {
+            //                RZ.Add(new Vertex(R0, Zi));
+            //                continue;
+            //            }
+            //            else if (RZ[RZ.Count - 1].R >= PointSource.R) continue;
+            //            else if (j == NumRDown - 1) Ri = PointSource.R;
+            //            else Ri = RZ[RZ.Count - 1].R + HrTmpDown;
 
-                        RZ.Add(new Vertex(Ri, Zi));
-                        HrTmpDown *= DiscRDown;
-                    }
+            //            RZ.Add(new Vertex(Ri, Zi));
+            //            HrTmpDown *= DiscRDown;
+            //        }
 
-                    for (int j = 0; j < NumRUp; j++)
-                    {
-                        //if (j == 0 && i == 0) continue;
-                        if (j == 0) continue;
-                        else if (j == NumRUp - 1) Ri = R1;
-                        else Ri = RZ[RZ.Count - 1].R + HrTmpUp;
+            //        for (int j = 0; j < NumRUp && RZ[RZ.Count - 1].R < R1; j++)
+            //        {                        
+            //            if (j == 0)
+            //            {
+            //                RZ.Add(new Vertex(PointSource.R + HrUp, Zi));
+            //                HrTmpUp *= DiscRUp;
+            //                continue;
+            //            }
+            //            else if (j == NumRUp - 1) Ri = R1;
+            //            else Ri = RZ[RZ.Count - 1].R + HrTmpUp;
 
-                        RZ.Add(new Vertex(Ri, Zi));
-                        HrTmpUp *= DiscRUp;
-                    }
-                    HzTmp *= DiscZUp;
-                }
-                NumPointSource = NumR * (NumZDown - 1) - 1 + NumRDown;
-                RZ[NumPointSource].NumOfFun = 1;
-            }
+            //            RZ.Add(new Vertex(Ri, Zi));
+            //            HrTmpUp *= DiscRUp;
+            //        }
+            //        if (i == 0) continue;
+            //        HzTmp *= DiscZDown;
+            //    }
+
+            //    HzTmp = HzUp;
+            //    for (int i = 0; i < NumZUp && RZ[RZ.Count - 1].Z < Z1; i++)
+            //    {
+            //        if (i == 0) Zi = PointSource.Z + HzUp;
+            //        else if (i == NumZUp - 1) Zi = Z1;
+            //        else Zi = RZ[RZ.Count - 1].Z + HzTmp;
+            //        HrTmpUp = HrUp;
+            //        HrTmpDown = HrDown;
+            //        for (int j = 0; j < NumRDown; j++)
+            //        {
+            //            //if (j == 0 && i == 0) continue;
+            //            if (j == 0)
+            //            {
+            //                RZ.Add(new Vertex(R0, Zi));
+            //                continue;
+            //            }
+            //            else if (RZ[RZ.Count - 1].R >= PointSource.R) continue;
+            //            else if (j == NumRDown - 1) Ri = PointSource.R;
+            //            else Ri = RZ[RZ.Count - 1].R + HrTmpDown;
+
+            //            RZ.Add(new Vertex(Ri, Zi));
+            //            HrTmpDown *= DiscRDown;
+            //        }
+
+            //        for (int j = 0; j < NumRUp && RZ[RZ.Count - 1].R < R1; j++)
+            //        {                        
+            //            if (j == 0)
+            //            {
+            //                RZ.Add(new Vertex(PointSource.R + HrUp, Zi));
+            //                HrTmpUp *= DiscRUp;
+            //                continue;
+            //            }
+            //            else if (j == NumRUp - 1) Ri = R1;
+            //            else Ri = RZ[RZ.Count - 1].R + HrTmpUp;
+
+            //            RZ.Add(new Vertex(Ri, Zi));
+            //            HrTmpUp *= DiscRUp;
+            //        }
+            //        HzTmp *= DiscZUp;
+            //    }
+            //    NumPointSource = NumR * (NumZDown - 1) - 1 + NumRDown;
+            //    RZ[NumPointSource].NumOfFun = 1;
+            //}
 
 
-            catch (Exception)
-            {
+            //catch (Exception)
+            //{
 
-                throw;
-            }
+            //    throw;
+            //}
         }
 
         private void InputBound1()
@@ -361,7 +516,7 @@ namespace MKE_kursovik
 
         private void InputNumofPram()
         {
-            NumOfParameters = new int[(NumZ - 1) * (NumR - 1)];
+            NumOfParameters = new int[(NumZ) * (NumR - 1)];
             //string path = "Param_on_Element.txt";
             //try
             //{
@@ -424,28 +579,35 @@ namespace MKE_kursovik
                     NumRUp = int.Parse(tmp[1]);
                     NumZDown = int.Parse(tmp[2]);
                     NumZUp = int.Parse(tmp[3]);
-                    NumR = NumRDown + NumRUp - 1;
-                    NumZ = NumZDown + NumZUp - 1;
+                    NumR = NumRDown + NumRUp;
+                    NumZ = NumZDown + NumZUp;
 
                     tmp = sr.ReadLine().Split();
-                    HrDown = double.Parse(tmp[0]);
-                    HrUp = double.Parse(tmp[1]);
-                    HzDown = double.Parse(tmp[2]);
-                    HzUp = double.Parse(tmp[3]);
+                    Hr = double.Parse(tmp[0]);
+                    //HrUp = double.Parse(tmp[1]);
+                    //HrUpEnd = double.Parse(tmp[2]);
+                    Hz = double.Parse(tmp[1]);
+					//HzUp = double.Parse(tmp[4]);
+					//HzUpEnd = double.Parse(tmp[5]);
 
-                    tmp = sr.ReadLine().Split();
-                    DiscRDown = double.Parse(tmp[0]);
-                    DiscRUp = double.Parse(tmp[1]);
-                    DiscZDown = double.Parse(tmp[2]);
-                    DiscZUp = double.Parse(tmp[3]);
+					tmp = sr.ReadLine().Split();
+					DiscRDown = double.Parse(tmp[0]);
+					DiscRUp = double.Parse(tmp[1]);
+					DiscZDown = double.Parse(tmp[2]);
+					DiscZUp = double.Parse(tmp[3]);
 
-                    tmp = sr.ReadLine().Split();
+					tmp = sr.ReadLine().Split();
                     R0 = double.Parse(tmp[0]);
                     R1 = double.Parse(tmp[1]);
 
                     tmp = sr.ReadLine().Split();
                     Z0 = double.Parse(tmp[0]);
                     Z1 = double.Parse(tmp[1]);
+
+                    //DiscRDown = (HrDown - PointSource.R) / (HrUp - PointSource.R);
+                    //DiscRUp = (HrUp - R1 + PointSource.R) / (HrUpEnd - R1 + PointSource.R);
+                    //DiscZDown = (HzDown - Math.Abs(Z0 - PointSource.R)) / (HzUp - Math.Abs(Z0 - PointSource.R));
+                    //DiscZUp = (HzUp - Math.Abs(Z1 - PointSource.R)) / (HzUpEnd - Math.Abs(Z1 - PointSource.R));
                 }
             }
             catch (IOException e)
@@ -481,7 +643,7 @@ namespace MKE_kursovik
             Element elementTmp;
 
 
-            for (int i = 0; i < NumZ - 1; i++)
+            for (int i = 0; i < NumZ; i++)
             {
                 for (int j = i * NumR; j < i * NumR + NumR - 1; j++)
                 {
