@@ -10,8 +10,6 @@ namespace MKE_kursovik
     {
         public IEnumerable<int> VertexArr { get; }
         public int NMat { get; }
-        //double Sigma { get; set; }
-        //double Mu { get; set; }
     }
 
     public class Element : IElement
@@ -338,78 +336,7 @@ namespace MKE_kursovik
             return LocalM;
         }
     }
-    //public double[,] GenLocal(double rp, Parameter param, double Hz, double Hr)
-    //{
-    //    double[,] LocalM = new double[4, 4];
-    //    double rp1 = rp + Hr,
-    //            log = Math.Log(Math.Abs(rp1 / rp));
-    //    LocalM[0, 0] = param.Mu * Hz * (Math.Pow(rp1, 2) * log - 2 * (Math.Pow(rp1, 2) - rp * rp1) + (Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2) / (3 * Math.Pow(Hr, 2));
-    //    LocalM[0, 1] = param.Mu * Hz * ((Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2 - 2 * rp1 * rp * log) / (3 * Math.Pow(Hr, 2));
-    //    LocalM[0, 2] = param.Mu * Hz * (Math.Pow(rp1, 2) * log - 2 * (Math.Pow(rp1, 2) - rp * rp1) + (Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2) / (6 * Math.Pow(Hr, 2));
-    //    LocalM[0, 3] = param.Mu * Hz * ((Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2 - 2 * rp1 * rp * log) / (6 * Math.Pow(Hr, 2));
-
-    //    LocalM[1, 0] = LocalM[0, 1];
-    //    LocalM[1, 1] = param.Mu * Hz * (Math.Pow(rp, 2) * log - 2 * (rp * rp1 - Math.Pow(rp, 2)) + (Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2) / (3 * Math.Pow(Hr, 2));
-    //    LocalM[1, 2] = LocalM[0, 3];
-    //    LocalM[1, 3] = param.Mu * Hz * (Math.Pow(rp, 2) * log - 2 * (rp * rp1 - Math.Pow(rp, 2)) + (Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2) / (6 * Math.Pow(Hr, 2));
-
-    //    LocalM[2, 0] = LocalM[0, 2];
-    //    LocalM[2, 1] = LocalM[1, 2];
-    //    LocalM[2, 2] = param.Mu * Hz * (Math.Pow(rp1, 2) * log - 2 * (Math.Pow(rp1, 2) - rp * rp1) + (Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2) / (3 * Math.Pow(Hr, 2));
-    //    LocalM[2, 3] = param.Mu * Hz * ((Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2 - 2 * rp1 * rp * log) / (3 * Math.Pow(Hr, 2));
-
-    //    LocalM[3, 0] = LocalM[3, 0];
-    //    LocalM[3, 1] = LocalM[1, 3];
-    //    LocalM[3, 2] = LocalM[2, 3];
-    //    LocalM[3, 3] = param.Mu * Hz * (Math.Pow(rp, 2) * log - 2 * (rp * rp1 - Math.Pow(rp, 2)) + (Math.Pow(rp1, 2) - Math.Pow(rp, 2)) / 2) / (3 * Math.Pow(Hr, 2));
-
-    //    return LocalM;
-    //}
-
-    // public double[,] GenLocal(double rp, Parameter param, double Hz, double Hr)
-    // {
-    //     double[,] LocalM = new double[4, 4];
-    //     double[,] LocalMr = new double[2, 2];
-    //     double[,] LocalMz = new double[2, 2];
-    //     double dr = rp / Hr,
-    //             log = Math.Log(1.0 + 1.0 / dr);
-
-    //     LocalMr[0, 0] = log * Math.Pow((1 + dr), 2) - dr - 3.0 / 2.0;
-    //     LocalMr[0, 1] = -log * dr * (1 + dr) + dr + 1.0 / 2.0;
-
-    //     LocalMr[1, 0] = -log * dr * (1 + dr) + dr + 1.0 / 2.0;
-    //     LocalMr[1, 1] = log * Math.Pow(dr, 2) - dr + 1.0 / 2.0;
-
-    //     LocalMz[0, 0] = Hz / 3.0;
-    //     LocalMz[0, 1] = Hz / 6.0;
-
-    //     LocalMz[1, 0] = Hz / 6.0;
-    //     LocalMz[1, 1] = Hz / 3.0;
-
-    //     LocalM[0, 0] = param.Mu * LocalMr[0, 0] * LocalMz[0, 0];
-    //     LocalM[0, 1] = param.Mu * LocalMr[0, 1] * LocalMz[0, 0];
-    //     LocalM[0, 2] = param.Mu * LocalMr[0, 0] * LocalMz[0, 1];
-    //     LocalM[0, 3] = param.Mu * LocalMr[0, 1] * LocalMz[0, 1];
-
-    //     LocalM[1, 0] = param.Mu * LocalMr[0, 1] * LocalMz[0, 0];
-    //     LocalM[1, 1] = param.Mu * LocalMr[1, 1] * LocalMz[0, 0];
-    //     LocalM[1, 2] = param.Mu * LocalMr[1, 0] * LocalMz[0, 1];
-    //     LocalM[1, 3] = param.Mu * LocalMr[1, 1] * LocalMz[0, 1];
-
-    //     LocalM[2, 0] = param.Mu * LocalMr[0, 0] * LocalMz[0, 1];
-    //     LocalM[2, 1] = param.Mu * LocalMr[1, 0] * LocalMz[0, 1];
-    //     LocalM[2, 2] = param.Mu * LocalMr[0, 0] * LocalMz[1, 1];
-    //     LocalM[2, 3] = param.Mu * LocalMr[0, 1] * LocalMz[1, 1];
-
-    //     LocalM[3, 0] = param.Mu * LocalMr[0, 1] * LocalMz[0, 1];
-    //     LocalM[3, 1] = param.Mu * LocalMr[1, 1] * LocalMz[0, 1];
-    //     LocalM[3, 2] = param.Mu * LocalMr[0, 1] * LocalMz[1, 1];
-    //     LocalM[3, 3] = param.Mu * LocalMr[1, 1] * LocalMz[1, 1];
-
-    //     return LocalM;
-    // }
-
-
+   
     public class GlobalMatrixM : IGlobalMatrix
     {
         public double[] ggl { get; set; }

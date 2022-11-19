@@ -135,6 +135,9 @@ namespace MKE_kursovik
                 case 4:
                     path = "Point/GridPoint8.txt";
                     break;
+                case 5:
+                    path = "Point/GridPoint16.txt";
+                    break;
                 default:
                     break;
             }

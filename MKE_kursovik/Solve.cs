@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 
 namespace MKE_kursovik
 {
@@ -156,6 +154,14 @@ namespace MKE_kursovik
                         path_out_p = "Point/output_p8.txt";
                     }
                     break;
+                case 5:
+                    {
+                        path_out = "Point/output16.txt";
+                        path_out_d = "Point/output_d16.txt";
+                        path_out_p = "Point/output_p16.txt";
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -173,6 +179,27 @@ namespace MKE_kursovik
 			gen.AddToGlobal(M, io.RZ, io.Elements, io.Params, ia, ja);
 			gen.AddToGlobal(M0, io.RZ, io.Elements, io.Params, ia, ja);
 			A.GenGolbalMatrixA(G, M, M0, io.Time[1] - io.Time[0]);
+
+            using (StreamWriter writer = new StreamWriter("Matrix_data/ia.txt", false))
+            {
+				writer.WriteLine(ia.Length);
+				foreach (var item in ia)
+                {
+                    writer.WriteLine(item.ToString());
+				}                
+            }
+
+			using (StreamWriter writer = new StreamWriter("Matrix_data/ja.txt", false))
+			{
+				writer.WriteLine(ja.Length);
+				foreach (var item in ja)
+				{
+					writer.WriteLine(item.ToString());
+				}
+			}
+
+		
+
 			N = io.RZ.Count();
 			Function function = new Function();
 
@@ -183,6 +210,8 @@ namespace MKE_kursovik
 				Q_tmp[i] = function.AzTrue(io.RZ[i], io.Time[0]);
 			}
 			Q.Add(Q_tmp);
+
+			
 
 			for (int i = 1; i < io.Time.Count; i++)
 			{
@@ -203,6 +232,43 @@ namespace MKE_kursovik
 					A.di[s1.NumVertex] = 1.0e20;
 					rightB.B[s1.NumVertex] = 1.0e20 * s1.S1Fun(io.RZ[s1.NumVertex], io.Time[i], s1.Side);
 				}
+
+				using (StreamWriter writer = new StreamWriter("Matrix_data/ggl.txt", false))
+				{
+					writer.WriteLine(A.ggl.Length);
+					foreach (var item in A.ggl)
+					{
+						writer.WriteLine(item.ToString());
+					}
+				}
+
+				using (StreamWriter writer = new StreamWriter("Matrix_data/ggu.txt", false))
+				{
+					writer.WriteLine(A.ggu.Length);
+					foreach (var item in A.ggu)
+					{
+						writer.WriteLine(item.ToString());
+					}
+				}
+
+				using (StreamWriter writer = new StreamWriter("Matrix_data/di.txt", false))
+				{
+					writer.WriteLine(A.di.Length);
+					foreach (var item in A.di)
+					{
+						writer.WriteLine(item.ToString());
+					}
+				}
+
+				using (StreamWriter writer = new StreamWriter("Matrix_data/right.txt", false))
+				{
+					writer.WriteLine(rightB.B.Length);
+					foreach (var item in rightB.B)
+					{
+						writer.WriteLine(item.ToString());
+					}
+				}
+
 				Q.Add(LOS());
 			}
 
@@ -262,7 +328,7 @@ namespace MKE_kursovik
 				{
                     P_tmp = new Vertex(R_BS[i].Item1, io.PointSource.Z);
                     Q_point = APoint(P_tmp, 1);
-                    writer.WriteLine(R_BS[i].Item1.ToString()+ "\t\t\t" + (Math.Abs((Q_point - R_BS[i].Item2) / R_BS[i].Item2)).ToString());
+                    writer.WriteLine(R_BS[i].Item1.ToString()+ "\t\t\t" + (Math.Abs((Q_point - R_BS[i].Item2))).ToString());
 				}
 
                 writer.Close();
@@ -477,7 +543,7 @@ namespace MKE_kursovik
         private double[] LOS()
         {
             double eps = 1e-15, norm, alfa = 0, beta = 0;
-            int k = 0, max_iter = 1000;
+            int k = 0, max_iter = 10000;
 
             double[] mult1, mult2, R, Z, P, ggl, ggu, di, Q_tmp;
             mult1 = new double[N];
@@ -493,11 +559,6 @@ namespace MKE_kursovik
             Array.Copy(A.ggu, ggu, A.ggu.Count());
             Array.Copy(A.di, di, A.di.Count());
             Array.Copy(A.ggl, ggl, A.ggl.Count());
-
-            //foreach (var s1 in io.Bound1)
-            //{
-            //    di[s1.NumVertex] = 1.0e50;
-            //}
 
             LUsq(ggl, ggu, di);
             mult1 = MultMatrixVector(Q_tmp);
@@ -536,10 +597,9 @@ namespace MKE_kursovik
                     P[i] = mult1[i] + beta * P[i];
                 }
                 norm = Math.Sqrt(ScalarProduct(R, R));
-
-                //Console.WriteLine("Iteration: " + (k + 1).ToString() + "\tError: " + norm.ToString());
+                Console.WriteLine("iter = " + k.ToString() + ", norm = " + norm.ToString()); 
             }
-
+            
             return Q_tmp;
         }
 
